@@ -95,7 +95,17 @@ async function getRandomWordFromDatabase(type, models, seed) {
           order: Sequelize.literal('RAND('+seed+')'),
         });
         // console.log(randomLyric)
-        randomWord = { "word": randomLyric.lyric, "useInPrompt": randomLyric.flagged === 0 ? 1 : 0}
+        const regex = /\[(.*?)\|(.*?)\]/g; // Regular expression to match possible bracketed words
+        let result = randomLyric.lyric;
+      
+        let match;
+        while ((match = regex.exec(randomLyric.lyric)) !== null) {
+          const fullMatch = match[0];
+          const replacementWord = match[2] || match[1]; // Use word after pipe or first word
+      
+          result = result.replace(fullMatch, replacementWord);
+        }
+        randomWord = { "word": result, "useInPrompt": randomLyric.flagged === 0 ? 1 : 0}
       }
     }
     if(!usedLyric) {
@@ -165,6 +175,7 @@ indexRouter.post('/api/save-image/:type?', (req, res) => {
 
 export async function getRandomMessage(imageType, seed) {
   // console.log("SEED:"+seed)
+  const rng = seedrandom(seed);
   seed = parseInt(seed)
   includesBadWord = false;
   replacedWords = [];
@@ -174,7 +185,6 @@ export async function getRandomMessage(imageType, seed) {
   let extra = ""
 
   if(imageType === "message") {
-    const rng = seedrandom(seed);
     const chance = Math.floor(rng() * 101)
     let rand = ""
     let msgType = "message"
@@ -213,7 +223,8 @@ export async function getRandomMessage(imageType, seed) {
     );
   
     let randomMeme = result[0][0].combined_data; // Access the first row of the results
-    extra = result[0][0].extra ?? ""
+    // console.log("MEME => "+randomMeme)
+    extra = result[0][0].extra ? (Math.floor(rng() * 101) > 50 ? result[0][0].extra: "") : ""
     
     randomMeme = await replaceBracketedWords(randomMeme, models, seed);
     randomMeme = randomMeme.toUpperCase()
