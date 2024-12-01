@@ -171,6 +171,7 @@ export async function getRandomMessage(imageType, seed) {
 
   let title = ""
   let outputString = ""
+  let extra = ""
 
   if(imageType === "message") {
     const rng = seedrandom(seed);
@@ -202,7 +203,7 @@ export async function getRandomMessage(imageType, seed) {
     }
     title = finalTitle.toUpperCase();
   } else if(imageType === "meme") {
-    const qry = 'SELECT CONCAT(COALESCE(topline, \'\'),\'|\',COALESCE(bottomline, \'\')) AS combined_data FROM misc.memes ORDER BY RAND('+seed+') LIMIT 1'
+    const qry = 'SELECT CONCAT(COALESCE(topline, \'\'),\'|\',COALESCE(bottomline, \'\')) AS combined_data, extra FROM misc.memes ORDER BY RAND('+seed+') LIMIT 1'
     const result = await sequelize.query( 
       qry,
       {
@@ -212,6 +213,7 @@ export async function getRandomMessage(imageType, seed) {
     );
   
     let randomMeme = result[0][0].combined_data; // Access the first row of the results
+    extra = result[0][0].extra ?? ""
     
     randomMeme = await replaceBracketedWords(randomMeme, models, seed);
     randomMeme = randomMeme.toUpperCase()
@@ -220,7 +222,7 @@ export async function getRandomMessage(imageType, seed) {
     outputString = memeParts[1]
   }
 
-  return {title, outputString, includesBadWord}
+  return {title, outputString, includesBadWord, extra}
 }
 
 indexRouter.get('/api/random/message/:seed?', async (req, res, next) => {

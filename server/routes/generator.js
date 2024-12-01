@@ -82,22 +82,23 @@ async function getMessage(imageType, seed, override, llm = "local", adMode) {
         const mParts = msg.message.split("|")
         msg = { "title": mParts[0], "outputString": mParts[1], includesBadWord: false }
     }
-    // console.log(msg)
+    // console.log("MSG => "+msg.extra)
 
-    const extra = adMode ? `,${process.env.LLM_PROMPT_ADDITION} ,` : ""
+    const modifier = adMode ? `,${process.env.LLM_PROMPT_ADDITION} ,` : ""
+    const extra = msg.extra !== "" ? ` Prompt should also involve '${msg.extra}'` : ""
     if(llm === "local") {
         if(imageType === "meme") {
             let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title
-            userPrompt = `${startsys}\n${sdPrompt}\n${startuser}\nCreate a prompt for the meme phrase${extra} '${memeMsg}'\n${ending}${startresp}\n`
+            userPrompt = `${startsys}\n${sdPrompt}\n${startuser}\nCreate a prompt for the meme phrase${modifier} '${memeMsg}'.${extra}\n${ending}${startresp}\n`
         } else {
-            userPrompt = `${startsys}\n${sdPrompt}\n${startuser}\nCreate a prompt for the an image based on the phrase${extra} '${msg.title}' heavily affected by the phrase '${msg.outputString}'\n${ending}${startresp}\n`
+            userPrompt = `${startsys}\n${sdPrompt}\n${startuser}\nCreate a prompt for the an image based on the phrase${modifier} '${msg.title}' heavily affected by the phrase '${msg.outputString}.${extra}'\n${ending}${startresp}\n`
         }
     } else {
         if(imageType === "meme") {
             let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title
-            userPrompt = `${sdPrompt}\nCreate a prompt for the meme phrase${extra} '${memeMsg}'`
+            userPrompt = `${sdPrompt}\nCreate a prompt for the meme phrase${modifier} '${memeMsg}'${extra}`
         } else {
-            userPrompt = `${sdPrompt}\nCreate a prompt for the an image based on the phrase${extra} '${msg.title}' heavily affected by the phrase '${msg.outputString}'`
+            userPrompt = `${sdPrompt}\nCreate a prompt for the an image based on the phrase${modifier} '${msg.title}' heavily affected by the phrase '${msg.outputString}'${extra}`
         }
         userPrompt = userPrompt + " Do not use square brackets or curly brackets. Try not to use a surreal description."
     }
