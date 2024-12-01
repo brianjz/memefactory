@@ -21,6 +21,7 @@ let replacedWords = [];
 let includesBadWord = false;
 
 async function replaceBracketedWords(msg, models, seed) {
+  // console.log("ORIG SEED: "+seed)
   const rng = seedrandom(seed);
   const pattern = /\[([\w\|\s|;]+)\]/g;
   const promises = [];
@@ -40,7 +41,8 @@ async function replaceBracketedWords(msg, models, seed) {
       let randomWord = orig
       const chance = Math.floor(rng() * 101);
       if(chance > 50 || orig === "") {
-        const randomWordData = await getRandomWordFromDatabase(type, models, seed++)
+        seed++
+        const randomWordData = await getRandomWordFromDatabase(type, models, seed)
         if(spl.length > 2) { // if repeating an existing replacement
           let loc = parseInt(spl[2])
           randomWord = replacedWords[loc];
@@ -73,6 +75,7 @@ async function replaceBracketedWords(msg, models, seed) {
 
 // Helper function to get a random word from the database
 async function getRandomWordFromDatabase(type, models, seed) {
+  // console.log("SEED: "+seed)
   try {
     let types = [type]
     if(type.indexOf(';') > -1) {
@@ -161,7 +164,7 @@ indexRouter.post('/api/save-image/:type?', (req, res) => {
 });
 
 export async function getRandomMessage(imageType, seed) {
-  console.log("SEED:"+seed)
+  // console.log("SEED:"+seed)
   seed = parseInt(seed)
   includesBadWord = false;
   replacedWords = [];

@@ -53,6 +53,7 @@ const StyledProgressBar = styled(ProgressBar)`
 
 const InfoListGroup = styled(ListGroup)`
     justify-content: center;
+    font-size: 0.75em;
 
     & #settings-button {
         width: inherit;
@@ -157,7 +158,7 @@ const HomePage = () => {
         setIsLoading(true);
         resetForm()
         setProgress(0)
-        setCurrentProcess("Generating Message...")
+        setCurrentProcess(`Generating Message in ${settings.llm}...`)
         try {
             let seed = parseInt(settings.seed)
             if(seed === -1) {
