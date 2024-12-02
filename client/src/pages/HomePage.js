@@ -264,6 +264,13 @@ const HomePage = () => {
         }
     }
 
+    const sdModels = JSON.parse(process.env.REACT_APP_SD_MODELS);
+    const sdOptions = Object.entries(sdModels).map(([key, value]) => (
+        <option key={key} value={key}>
+            {value}
+        </option>
+    ));
+
     return (
         <Container data-bs-theme="dark">
             <Row>
@@ -361,15 +368,7 @@ const HomePage = () => {
                         value={settings.checkpoint}
                         onChange={handleSettingChange}
                     >
-                        <option value="_current\juggernaut_reborn">Juggernaut (Realism)</option>
-                        <option value="_current\photon_v1">Photon (Realism)</option>
-                        <option value="_current\dreamshaper_8">Dreamshaper (Realism Lite)</option>
-                        <option value="_current\realcartoonRealistic_v16">RC Realistic (Realism Light)</option>
-                        <option value="cartoon\arthemyComics_v60">Arthemy (Comic)</option>
-                        <option value="cartoon\rcnzCartoon3d_v20">RCNZ (Cartoon)</option>
-                        <option value="cartoon\realcartoon3d_v15">RealCartoon (Cartoon)</option>
-                        <option value="cartoon\revAnimated_v122">RevAnimated (Animation)</option>
-                        <option value="anime\abyssorangemix3AOM3_aom3a1b">AbyssOrange (Anime)</option>
+                        {sdOptions}
                     </Form.Select>
 
                     <Form.Label htmlFor="seed">Seed</Form.Label>

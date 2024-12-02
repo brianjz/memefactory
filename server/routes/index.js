@@ -367,16 +367,38 @@ indexRouter.get('/api/random/savedimage/:spot?', async (req, res) => {
     }
 })
 
-indexRouter.get('/api/meme', async (req, res) => {
+indexRouter.get('/api/memes', async (req, res) => {
   try {
-    const rand = await models.memes.findOne({
-      order: Sequelize.literal('RAND()') 
+    const memes = await models.memes.findAll({
+      order: Sequelize.literal('topline ASC') 
     });
     
-    res.json(rand);
+    res.json(memes);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to fetch random meme' });
+    res.status(500).json({ error: 'Failed to fetch memes' });
+  }
+});
+
+indexRouter.post('/api/meme/update', async (req, res) => {
+  try {
+    const updatedItem = await models.memes.update(req.body, {
+      where: { id: req.body.id }
+    });
+    res.json(updatedItem);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update meme' });
+  }
+});
+
+indexRouter.post('/api/meme/new', async (req, res) => {
+  try {
+    const createdItem = await models.memes.create(req.body); // Replace YourModel with your Sequelize model
+    res.json(createdItem);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create new meme' });
   }
 });
 
