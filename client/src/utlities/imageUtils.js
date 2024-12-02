@@ -1,6 +1,11 @@
 import { createCanvas, loadImage } from 'canvas';
 
-export async function addTextToImage(base64Image, mainTitleText, messageText, msgType) {
+export async function addTextToImage(base64Image, mainTitleText, messageText, msgType, generator) {
+    // flux does 1024x768 and SD does 768x512, so font size looks different
+    let messageTopTextSize = generator === "flux" ? 60 : 54
+    let messageBottomTextSize = generator === "flux" ? 32 : 26
+    let memeTextSize = generator === "flux" ? 60 : 54
+    
     try {
         let processedBase64 = ""
         const dataURL = `data:image/jpeg;base64,${base64Image}`;
@@ -25,7 +30,7 @@ export async function addTextToImage(base64Image, mainTitleText, messageText, ms
             ctx.drawImage(img, borderSize, borderSize, originalWidth, originalHeight);
         
             // Set up text styles (adjust font family and size as needed)
-            ctx.font = '64px Times'; 
+            ctx.font = messageTopTextSize+'px Times'; 
             ctx.fillStyle = 'white';
         
             // Function to measure text width
@@ -39,11 +44,10 @@ export async function addTextToImage(base64Image, mainTitleText, messageText, ms
               });
             }        
             // Resize main title text to fit
-            let textSize = 60;
             let textWidth = await measureTextWidth(mainTitleText);
             while (textWidth > (newWidth - 10)) {
-                textSize -= 1;
-                ctx.font = `${textSize}px Times`;
+              messageTopTextSize -= 1;
+                ctx.font = `${messageTopTextSize}px Times`;
                 textWidth = await measureTextWidth(mainTitleText);
             }
         
@@ -53,12 +57,11 @@ export async function addTextToImage(base64Image, mainTitleText, messageText, ms
             ctx.fillText(mainTitleText, textX, textY);
         
             // Resize message text to fit
-            ctx.font = '32px Times'; 
-            let textSize2 = 32;
+            ctx.font = messageBottomTextSize+'px Times'; 
             let textWidth2 = await measureTextWidth(messageText);
             while (textWidth2 > (newWidth - 5)) {
-                textSize2 -= 1;
-                ctx.font = `${textSize2}px Times`;
+              messageBottomTextSize -= 1;
+                ctx.font = `${messageBottomTextSize}px Times`;
                 textWidth2 = await measureTextWidth(messageText);
             }
         
@@ -82,8 +85,8 @@ export async function addTextToImage(base64Image, mainTitleText, messageText, ms
             // Set up text parameters
             const topText = mainTitleText;
             const bottomText = messageText;
-            let topFontSize = 60;
-            let bottomFontSize = 60;
+            let topFontSize = memeTextSize;
+            let bottomFontSize = memeTextSize;
             ctx.fillStyle = 'white'; // Text color
             ctx.shadowColor = 'black'; // Shadow color
             ctx.shadowOffsetX = 2;

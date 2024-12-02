@@ -197,7 +197,7 @@ const HomePage = () => {
             setGeneratedCkpt(imageData["checkpoint"])
             setProgress(95)
             setOriginalImage("data:image/jpeg;base64,"+image)
-            addTextToImage(image, title, message, imageType) 
+            addTextToImage(image, title, message, imageType, generatorType) 
             .then(processedBase64 => {
                 setImageData(processedBase64);
             });

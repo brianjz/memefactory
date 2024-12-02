@@ -223,7 +223,7 @@ export async function getRandomMessage(imageType, seed) {
     );
   
     let randomMeme = result[0][0].combined_data; // Access the first row of the results
-    // console.log("MEME => "+randomMeme)
+        // console.log("MEME => "+randomMeme)
     extra = result[0][0].extra ? (Math.floor(rng() * 101) > 50 ? result[0][0].extra: "") : ""
     
     randomMeme = await replaceBracketedWords(randomMeme, models, seed);

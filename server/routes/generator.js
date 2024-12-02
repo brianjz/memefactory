@@ -82,16 +82,16 @@ async function getMessage(imageType, seed, override, llm = "local", adMode) {
         const mParts = msg.message.split("|")
         msg = { "title": mParts[0], "outputString": mParts[1], includesBadWord: false }
     }
-    // console.log("MSG => "+msg.extra)
+    console.log(`MSG ==> ${msg.title} | ${msg.outputString}`)
 
-    const modifier = adMode ? `,${process.env.LLM_PROMPT_ADDITION} ,` : ""
+    const modifier = adMode ? `, ${process.env.LLM_PROMPT_ADDITION} ,` : ""
     const extra = msg.extra !== "" ? ` Prompt should also involve '${msg.extra}'` : ""
     if(llm === "local") {
         if(imageType === "meme") {
             let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title
-            userPrompt = `${startsys}\n${sdPrompt}\n${startuser}\nCreate a prompt for the meme phrase${modifier} '${memeMsg}'.${extra}\n${ending}${startresp}\n`
+            userPrompt = `${startsys}\n${sdPrompt}\n${startuser}\nCreate a prompt for the meme phrase${modifier}'${memeMsg}'.${extra}\n${ending}${startresp}\n`
         } else {
-            userPrompt = `${startsys}\n${sdPrompt}\n${startuser}\nCreate a prompt for the an image based on the phrase${modifier} '${msg.title}' heavily affected by the phrase '${msg.outputString}.${extra}'\n${ending}${startresp}\n`
+            userPrompt = `${startsys}\n${sdPrompt}\n${startuser}\nCreate a prompt for the an image based on the phrase${modifier}'${msg.title}' heavily affected by the phrase '${msg.outputString}.${extra}'\n${ending}${startresp}\n`
         }
     } else {
         if(imageType === "meme") {
@@ -103,7 +103,12 @@ async function getMessage(imageType, seed, override, llm = "local", adMode) {
         userPrompt = userPrompt + " Do not use square brackets or curly brackets. Try not to use a surreal description."
     }
 
-    return {title: msg.title, message: msg.outputString, userPrompt, includesBadWord: msg.includesBadWord}
+    let hasBadWord = msg.includesBadWord
+    if(llm === "local" && adMode) {
+        console.log("ADMODE => skipping bad word flag")
+        hasBadWord = false
+    }
+    return {title: msg.title, message: msg.outputString, userPrompt, includesBadWord: hasBadWord}
 }
 
 async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "local") {
@@ -178,7 +183,7 @@ async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "loca
             }
 
             const responseText = geminiResult.response.text().replace("\n<|im_end|>","").replace(",  ", ", ").trim()
-            console.log(responseText);
+            console.log("GEMINI => "+responseText);
             finalPrompt = responseText
         }
     }
@@ -199,8 +204,9 @@ generatorRouter.post('/getPrompt/:llm/:generator/:type/:seed', async (req, res, 
     const adMode = req.body.adMode && req.body.adMode !== 0
     try {
         const messageData = await getMessage(imageType, seed, override, llm, adMode)
+        // console.log("MSG => "+messageData.userPrompt)
         let finalPrompt = "Error"
-        if(!messageData.includesBadWord) {
+        if(!messageData.includesBadWord && llm !== "none") {
             finalPrompt = await buildPrompt(messageData.userPrompt, seed, generator, llm)
         } else {
             finalPrompt = await getRandomPrompt("sd15", seed)
