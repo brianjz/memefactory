@@ -41,8 +41,10 @@ async function replaceBracketedWords(msg, models, seed) {
       let randomWord = orig
       const chance = Math.floor(rng() * 101);
       if(chance > 50 || orig === "") {
-        seed++
-        const randomWordData = await getRandomWordFromDatabase(type, models, seed)
+        // seed++
+        var prng = new seedrandom();
+        const wordseed = prng.int32() // debugging seed issues
+        const randomWordData = await getRandomWordFromDatabase(type, models, wordseed)
         if(spl.length > 2) { // if repeating an existing replacement
           let loc = parseInt(spl[2])
           randomWord = replacedWords[loc];
