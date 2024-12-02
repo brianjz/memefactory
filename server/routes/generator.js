@@ -147,6 +147,7 @@ async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "loca
             const data1 = await llmImagePrompt.json();
         
             finalPrompt = data1["results"][0]["text"]
+            console.log("LOCAL LLM => "+finalPrompt);
         } else if (llm === "gemini") {
             const safetySettings = [
                 {
