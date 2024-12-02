@@ -42,8 +42,7 @@ async function replaceBracketedWords(msg, models, seed) {
       const chance = Math.floor(rng() * 101);
       if(chance > 50 || orig === "") {
         // seed++
-        var prng = new seedrandom();
-        const wordseed = prng.int32() // debugging seed issues
+        const wordseed = rng.int32() // debugging seed issues
         const randomWordData = await getRandomWordFromDatabase(type, models, wordseed)
         if(spl.length > 2) { // if repeating an existing replacement
           let loc = parseInt(spl[2])
@@ -225,7 +224,7 @@ export async function getRandomMessage(imageType, seed) {
     );
   
     let randomMeme = result[0][0].combined_data; // Access the first row of the results
-        // console.log("MEME => "+randomMeme)
+    // console.log("MEME => "+randomMeme)
     extra = result[0][0].extra ? (Math.floor(rng() * 101) > 50 ? result[0][0].extra: "") : ""
     
     randomMeme = await replaceBracketedWords(randomMeme, models, seed);
