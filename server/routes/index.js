@@ -28,20 +28,14 @@ async function replaceBracketedWords(msg, models, seed) {
 
   console.log("ORIG MSG => "+msg)
   // First pass: Find all bracketed sections and create Promises
-  msg.replace(pattern, (match, foundString) => {
+  msg.replace(pattern, (match, wordTypes) => {
     const promise = (async () => {
       let orig = "";
       let spl = [];
-      let singularModifier = false
-      if (foundString.includes("|")) {
-        spl = foundString.split("|");
-        foundString = spl[0];
+      if (wordTypes.includes("|")) {
+        spl = wordTypes.split("|");
+        wordTypes = spl[0];
         orig = spl[1];
-      }
-      // console.log(foundString)
-      if (foundString.indexOf("!") > -1) {
-        // foundString = foundString.substring(0, foundString.length-1)
-        singularModifier = true
       }
 
       // Fetch a random word from the database based on the type
@@ -52,7 +46,7 @@ async function replaceBracketedWords(msg, models, seed) {
         // console.log("SPL => "+spl)
         // console.log("ReplW => "+replacedWords)
         const wordseed = rng.int32() // debugging seed issues
-        const randomWordData = await getRandomWordFromDatabase(foundString, models, wordseed, singularModifier)
+        const randomWordData = await getRandomWordFromDatabase(wordTypes, models, wordseed)
         if(spl.length > 2) { // if repeating an existing replacement
           let loc = parseInt(spl[2])
           randomWord = replacedWords[loc];
@@ -64,9 +58,6 @@ async function replaceBracketedWords(msg, models, seed) {
             includesBadWord = true
           }
           randomWord = randomWordData["word"]
-          if(singularModifier) {
-            randomWord = randomWord.substring(randomWord.indexOf(" ")+1)
-          }
           // console.log("RW => "+randomWord)
           replacedWords.push(randomWord)
         }
@@ -88,13 +79,17 @@ async function replaceBracketedWords(msg, models, seed) {
 }
 
 // Helper function to get a random word from the database
-async function getRandomWordFromDatabase(type, models, seed) {
+async function getRandomWordFromDatabase(wordTypeString, models, seed) {
   // console.log("SEED: "+seed)
   try {
-    let types = [type]
-    if(type.indexOf(';') > -1) {
-      types = type.split(';').map(item => item.replace('!', ''));
-    }
+    let singularModified = []
+    let types = wordTypeString.split(';').map(item => {
+      if (item.includes('!')) {
+        item = item.replace('!', '')
+        singularModified.push(item);
+      }
+      return item
+    })
     let randomWord = {"word": "word", "useInPrompt": 1}
     let usedLyric = false
     if(types.includes("LYRIC")) {
@@ -127,13 +122,17 @@ async function getRandomWordFromDatabase(type, models, seed) {
         where: { wordtype: { [Op.in]: types } },
         order: Sequelize.literal('RAND('+seed+')'),
       });
+      // console.log(randomWord)
+      if(singularModified.includes(randomWord["wordtype"])) {
+        randomWord["word"] = randomWord["word"].substring(randomWord["word"].indexOf(" ")+1)
+      }
     }
 
     if (randomWord) {
       return randomWord;
     } else {
       // Handle case where no word is found for the given type
-      console.log("No word found for type:", type);
+      console.log("No word found for type:", wordTypeString);
       return "[No word found]"; 
     }
 
