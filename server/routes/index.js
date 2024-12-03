@@ -214,7 +214,7 @@ export async function getRandomMessage(imageType, seed) {
     }
     title = finalTitle.toUpperCase();
   } else if(imageType === "meme") {
-    const qry = 'SELECT CONCAT(COALESCE(topline, \'\'),\'|\',COALESCE(bottomline, \'\')) AS combined_data, extra FROM misc.memes ORDER BY RAND('+seed+') LIMIT 1'
+    const qry = 'SELECT CONCAT(COALESCE(topline, \'\'),\'||\',COALESCE(bottomline, \'\')) AS combined_data, extra FROM misc.memes ORDER BY RAND('+seed+') LIMIT 1'
     const result = await sequelize.query( 
       qry,
       {
@@ -229,7 +229,9 @@ export async function getRandomMessage(imageType, seed) {
     
     randomMeme = await replaceBracketedWords(randomMeme, models, seed);
     randomMeme = randomMeme.toUpperCase()
-    const memeParts = randomMeme.split('|')
+    console.log(randomMeme)
+    const memeParts = randomMeme.split('||')
+    console.log(memeParts[0] + " -- " + memeParts[1])
     title = memeParts[0]
     outputString = memeParts[1]
   }
