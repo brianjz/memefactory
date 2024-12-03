@@ -4,6 +4,7 @@ import GalleryPage from "./pages/Gallery";
 import EditMemesPage from "./pages/edit/Memes";
 import EditMessagesPage from "./pages/edit/Messages";
 import EditWordsPage from "./pages/edit/Words";
+import EditLyricsPage from "./pages/edit/Lyrics";
 import App from "./App";
 
 const router = createBrowserRouter([
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
         {
             path: "/edit/words",
             element: <EditWordsPage />
+        },
+        {
+            path: "/edit/lyrics",
+            element: <EditLyricsPage />
         },
         ]
     },

@@ -285,7 +285,7 @@ const HomePage = () => {
                             messageType: settings.messageType === "meme" ? "message" : "meme",
                         }));
                     }}>{settings.messageType === "meme" ? "Meme" : "Motivational"}</ListGroup.Item>
-                    <ListGroup.Item className="text-center">{settings.generator}<br />{settings.llm}</ListGroup.Item>
+                    <ListGroup.Item onClick={handleShow} className="text-center">{settings.generator}<br />{settings.llm}</ListGroup.Item>
                 </InfoListGroup>
             </Col>
             <Col md="12" className="text-center" id="image-col">
@@ -409,6 +409,7 @@ const HomePage = () => {
                             <Dropdown.Item href="/edit/memes" target="_blank">Memes</Dropdown.Item>
                             <Dropdown.Item href="/edit/messages" target="_blank">Messages</Dropdown.Item>
                             <Dropdown.Item href="/edit/words" target="_blank">Words</Dropdown.Item>
+                            <Dropdown.Item href="/edit/lyrics" target="_blank">Lyrics</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </Offcanvas.Body>

@@ -338,7 +338,9 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
             const returnedData = await imageCreation.json();
 
             image = returnedData["images"][0]
-            const usedPrompt = JSON.parse(returnedData["info"])["prompt"]
+            const info = returnedData["info"]
+            const usedPrompt = JSON.parse(info)["prompt"]
+            console.log("SD INFO => " + info)
             let imageData = { prompt: usedPrompt, image: image }
             return imageData
         } catch (error) {

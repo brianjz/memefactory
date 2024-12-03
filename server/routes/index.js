@@ -473,4 +473,40 @@ indexRouter.post('/api/word/new', async (req, res) => {
   }
 });
 
+indexRouter.get('/api/lyrics', async (req, res) => {
+  try {
+    const memes = await models.lyrics.findAll({
+      order: Sequelize.literal('lyric ASC') 
+    });
+    
+    res.json(memes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch lyrics' });
+  }
+});
+
+indexRouter.post('/api/lyric/update', async (req, res) => {
+  try {
+    const updatedItem = await models.lyrics.update(req.body, {
+      where: { id: req.body.id }
+    });
+    res.json(updatedItem);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update lyric' });
+  }
+});
+
+indexRouter.post('/api/lyric/new', async (req, res) => {
+  try {
+    const createdItem = await models.lyrics.create(req.body);
+    res.json(createdItem);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create new lyric' });
+  }
+});
+
+
 export default indexRouter;
