@@ -6,7 +6,7 @@
 <img src="https://github.com/user-attachments/assets/597128b7-067f-4056-8f5e-029a3d56af96" alt="I CAN HAZ NACHOS" width="500"/>
 </p>
 
-After playing the Jackbox game "Job Job", we found it funny when random absurd motivational posters would appear. I thought I'd try my hand at it, then decided it'd be even funnier if we could use a LLM and image generation to make it even more random and absurd. It, obviously, expanded into memes.
+After playing the [Jackbox game "Job Job"](https://www.jackboxgames.com/games/the-jackbox-party-pack-8/job-job), we found it funny when random absurd motivational posters would appear. I thought I'd try my hand at it, then decided it'd be even funnier if we could use a LLM and image generation to make it even more random and absurd. It, obviously, expanded into memes.
 
 It started as a sort of *proof of concept* in PHP and went from there, so it keeps getting things tacked on. I decided to move it to React to make it easier it update and expand on.
 
