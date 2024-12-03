@@ -234,9 +234,10 @@ generatorRouter.post('/getImage/:generator/:seed', async (req, res, next) => {
     const checkpoint = req.body.checkpoint ?? ""
     const finalPrompt = req.body.prompt ?? ""
     const port = req.body.port ?? 8188
+    const adMode = req.body.adMode && req.body.adMode !== 0
     try {
         // console.log(finalPrompt);
-        const imageData = await generateImage(finalPrompt, seed, generator, checkpoint, port)
+        const imageData = await generateImage(finalPrompt, seed, generator, checkpoint, port, adMode)
 
         if (!res.headersSent) {
             res.json(imageData);
@@ -250,7 +251,7 @@ generatorRouter.post('/getImage/:generator/:seed', async (req, res, next) => {
     }
 })
 
-async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoint, port) {
+async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoint, port, adMode = false) {
     let image = ""
     if(generatorType === "flux" || generatorType === "comfy") {
         try {
@@ -279,6 +280,7 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
         }
     } else if(generatorType === "sd15") {
         try {
+            const neg = adMode ? process.env.SD_PROMPT_NEGAD : process.env.SD_PROMPT_NEGATIVE
             let checkpointChange = {
                 "sd_model_checkpoint": checkpoint
             }
@@ -292,7 +294,7 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
 
             let sdData = {
                 "prompt": finalPrompt,
-                "negative_prompt": "nsfw",
+                "negative_prompt": neg,
                 "seed": seed,
                 "sampler_name": "DPM++ 2M SDE",
                 "batch_size": 1,

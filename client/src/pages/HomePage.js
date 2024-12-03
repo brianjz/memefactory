@@ -190,7 +190,7 @@ const HomePage = () => {
             
             setCurrentProcess(`Generating Image in ${settings.generator}...`)
             const imageStartTime = new Date();
-            const imageData = await generateImage(prompt, seed, generatorType, settings.checkpoint, settings.port)
+            const imageData = await generateImage(prompt, seed, generatorType, settings.checkpoint, settings.port, adMode)
             const imageEndTime = new Date();
             const image = imageData["image"]
             setGeneratedPrompt(imageData["prompt"])

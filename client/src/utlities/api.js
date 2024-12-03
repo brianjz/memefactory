@@ -30,14 +30,14 @@ export async function getRandomSavedFile(sort = "random") {
     return file
 }
 
-export async function generateImage(prompt, seed, generator = "sd15", checkpoint, port) {
+export async function generateImage(prompt, seed, generator = "sd15", checkpoint, port, adMode) {
     const url = `/api/generator/getImage/${generator}/${seed}`
     const messageResponse = await fetch(url, {
         method: 'POST', 
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({prompt: prompt, checkpoint: checkpoint, port: port})
+        body: JSON.stringify({prompt: prompt, checkpoint: checkpoint, port: port, adMode: adMode})
     });
 
     return await messageResponse.json();
