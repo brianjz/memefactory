@@ -20,7 +20,7 @@ const indexRouter = express.Router();
 let replacedWords = [];
 let includesBadWord = false;
 
-async function replaceBracketedWords(msg, models, seed) {
+async function replaceBracketedWords(msg, seed) {
   // console.log("ORIG SEED: "+seed)
   const rng = seedrandom(seed);
   const pattern = /\[([\w\!\|\s|;|\-]+)\]/g;
@@ -46,7 +46,7 @@ async function replaceBracketedWords(msg, models, seed) {
         // console.log("SPL => "+spl)
         // console.log("ReplW => "+replacedWords)
         const wordseed = rng.int32() // debugging seed issues
-        const randomWordData = await getRandomWordFromDatabase(wordTypes, models, wordseed)
+        const randomWordData = await getRandomWordFromDatabase(wordTypes, wordseed)
         if(spl.length > 2) { // if repeating an existing replacement
           let loc = parseInt(spl[2])
           randomWord = replacedWords[loc];
@@ -79,7 +79,7 @@ async function replaceBracketedWords(msg, models, seed) {
 }
 
 // Helper function to get a random word from the database
-async function getRandomWordFromDatabase(wordTypeString, models, seed) {
+async function getRandomWordFromDatabase(wordTypeString, seed) {
   // console.log("SEED: "+seed)
   try {
     let singularModified = []
@@ -186,7 +186,7 @@ indexRouter.post('/api/save-image/:type?', (req, res) => {
   }
 });
 
-export async function getRandomMessage(imageType, seed) {
+export async function getRandomMessage(imageType, seed, override = "") {
   // console.log("SEED:"+seed)
   const rng = seedrandom(seed);
   seed = parseInt(seed)
@@ -197,55 +197,64 @@ export async function getRandomMessage(imageType, seed) {
   let outputString = ""
   let extra = ""
 
-  if(imageType === "message") {
-    const chance = Math.floor(rng() * 101)
-    let rand = ""
-    let msgType = "message"
-    if(chance > 60) {
-      rand = await models.messages.findOne({
-        order: Sequelize.literal('RAND('+seed+')')
-      });
-    } else {
-      msgType = "lyric"
-      rand = await models.lyrics.findOne({
-        order: Sequelize.literal('RAND('+seed+')')
-      });
-    }
-    outputString = await replaceBracketedWords(msgType === "message" ? rand.message : rand.lyric, models, seed);
-
-    seed = seed + 1;
-    const randTitle = await models.words.findOne({
-      order: Sequelize.literal('RAND('+seed+')')
-    });
-
-    const finalTitle = await replaceBracketedWords(randTitle.word, models, seed);
-    
-    outputString = outputString.charAt(0).toUpperCase() + outputString.slice(1);
-    if(randTitle.useInPrompt === 0 || rand.flagged === 1) {
-      includesBadWord = true
-    }
-    title = finalTitle.toUpperCase();
-  } else if(imageType === "meme") {
-    const qry = 'SELECT CONCAT(COALESCE(topline, \'\'),\'||\',COALESCE(bottomline, \'\')) AS combined_data, extra FROM misc.memes ORDER BY RAND('+seed+') LIMIT 1'
-    const result = await sequelize.query( 
-      qry,
-      {
-        plain: false,
-        raw: true,   
+  if(override !== "") {
+    console.log(imageType.toUpperCase()+" OVERRIDE")
+    let replacedString = await replaceBracketedWords(override, seed)
+    replacedString = imageType === "meme" ? replacedString.toUpperCase() : replaceString
+    const stringParts = replacedString.split('|')
+    title = stringParts[0]
+    outputString = stringParts[1]
+  } else {
+    if(imageType === "message") {
+      const chance = Math.floor(rng() * 101)
+      let rand = ""
+      let msgType = "message"
+      if(chance > 60) {
+        rand = await models.messages.findOne({
+          order: Sequelize.literal('RAND('+seed+')')
+        });
+      } else {
+        msgType = "lyric"
+        rand = await models.lyrics.findOne({
+          order: Sequelize.literal('RAND('+seed+')')
+        });
       }
-    );
-  
-    let randomMeme = result[0][0].combined_data; // Access the first row of the results
-    // console.log("MEME => "+randomMeme)
-    extra = result[0][0].extra ? (Math.floor(rng() * 101) > 50 ? result[0][0].extra: "") : ""
+      outputString = await replaceBracketedWords(msgType === "message" ? rand.message : rand.lyric, models, seed);
+
+      seed = seed + 1;
+      const randTitle = await models.words.findOne({
+        order: Sequelize.literal('RAND('+seed+')')
+      });
+
+      const finalTitle = await replaceBracketedWords(randTitle.word, models, seed);
+      
+      outputString = outputString.charAt(0).toUpperCase() + outputString.slice(1);
+      if(randTitle.useInPrompt === 0 || rand.flagged === 1) {
+        includesBadWord = true
+      }
+      title = finalTitle.toUpperCase();
+    } else if(imageType === "meme") {
+      const qry = 'SELECT CONCAT(COALESCE(topline, \'\'),\'||\',COALESCE(bottomline, \'\')) AS combined_data, extra FROM misc.memes ORDER BY RAND('+seed+') LIMIT 1'
+      const result = await sequelize.query( 
+        qry,
+        {
+          plain: false,
+          raw: true,   
+        }
+      );
     
-    randomMeme = await replaceBracketedWords(randomMeme, models, seed);
-    randomMeme = randomMeme.toUpperCase()
-    // console.log(randomMeme)
-    const memeParts = randomMeme.split('||')
-    // console.log(memeParts[0] + " -- " + memeParts[1])
-    title = memeParts[0]
-    outputString = memeParts[1]
+      let randomMeme = result[0][0].combined_data; // Access the first row of the results
+      // console.log("MEME => "+randomMeme)
+      extra = result[0][0].extra ? (Math.floor(rng() * 101) > 50 ? result[0][0].extra: "") : ""
+      
+      randomMeme = await replaceBracketedWords(randomMeme, models, seed);
+      randomMeme = randomMeme.toUpperCase()
+      // console.log(randomMeme)
+      const memeParts = randomMeme.split('||')
+      // console.log(memeParts[0] + " -- " + memeParts[1])
+      title = memeParts[0]
+      outputString = memeParts[1]
+    }
   }
 
   return {title, outputString, includesBadWord, extra}

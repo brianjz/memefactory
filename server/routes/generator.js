@@ -74,14 +74,7 @@ const llmData = {
 async function getMessage(imageType, seed, override, llm = "local", adMode) {
     let userPrompt = ""            
     let messageResponse = { message: override.toUpperCase(), "includesBadWord": false }
-    let msg = messageResponse
-    if(override === "") {
-        const apiType = imageType === "meme" ? "meme" : "message";
-        msg = await getRandomMessage(apiType, seed)
-    } else {
-        const mParts = msg.message.split("|")
-        msg = { "title": mParts[0], "outputString": mParts[1], includesBadWord: false }
-    }
+    const msg = await getRandomMessage(imageType, seed, override)
     console.log(`MSG ==> ${msg.title} | ${msg.outputString}`)
 
     const modifier = adMode ? `, ${process.env.LLM_PROMPT_ADDITION} ,` : ""
