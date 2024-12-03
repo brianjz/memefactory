@@ -229,9 +229,9 @@ export async function getRandomMessage(imageType, seed) {
     
     randomMeme = await replaceBracketedWords(randomMeme, models, seed);
     randomMeme = randomMeme.toUpperCase()
-    console.log(randomMeme)
+    // console.log(randomMeme)
     const memeParts = randomMeme.split('||')
-    console.log(memeParts[0] + " -- " + memeParts[1])
+    // console.log(memeParts[0] + " -- " + memeParts[1])
     title = memeParts[0]
     outputString = memeParts[1]
   }
