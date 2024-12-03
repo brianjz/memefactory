@@ -26,7 +26,6 @@ async function replaceBracketedWords(msg, models, seed) {
   const pattern = /\[([\w\!\|\s|;|\-]+)\]/g;
   const promises = [];
 
-  msg = "Ok, [PERSON!;PROPERNAME|boomer]||"
   console.log("ORIG MSG => "+msg)
   // First pass: Find all bracketed sections and create Promises
   msg.replace(pattern, (match, foundString) => {
