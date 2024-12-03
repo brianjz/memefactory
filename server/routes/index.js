@@ -26,6 +26,7 @@ async function replaceBracketedWords(msg, models, seed) {
   const pattern = /\[([\w\!\|\s|;|\-]+)\]/g;
   const promises = [];
 
+  msg = "Ok, [PERSON!;PROPERNAME|boomer]||"
   console.log("ORIG MSG => "+msg)
   // First pass: Find all bracketed sections and create Promises
   msg.replace(pattern, (match, foundString) => {
@@ -38,8 +39,9 @@ async function replaceBracketedWords(msg, models, seed) {
         foundString = spl[0];
         orig = spl[1];
       }
+      // console.log(foundString)
       if (foundString.indexOf("!") > -1) {
-        foundString = foundString.substring(0, foundString.length-1)
+        // foundString = foundString.substring(0, foundString.length-1)
         singularModifier = true
       }
 
@@ -51,7 +53,7 @@ async function replaceBracketedWords(msg, models, seed) {
         // console.log("SPL => "+spl)
         // console.log("ReplW => "+replacedWords)
         const wordseed = rng.int32() // debugging seed issues
-        const randomWordData = await getRandomWordFromDatabase(foundString, models, wordseed)
+        const randomWordData = await getRandomWordFromDatabase(foundString, models, wordseed, singularModifier)
         if(spl.length > 2) { // if repeating an existing replacement
           let loc = parseInt(spl[2])
           randomWord = replacedWords[loc];
@@ -92,7 +94,7 @@ async function getRandomWordFromDatabase(type, models, seed) {
   try {
     let types = [type]
     if(type.indexOf(';') > -1) {
-      types = type.split(';')
+      types = type.split(';').map(item => item.replace('!', ''));
     }
     let randomWord = {"word": "word", "useInPrompt": 1}
     let usedLyric = false
