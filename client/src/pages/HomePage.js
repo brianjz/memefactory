@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { addTextToImage } from '../utlities/imageUtils';
 import { getPrompt, generateImage, getRandomSavedFile } from '../utlities/api';
 import { getQueryStringParameter } from "../utlities/general";
-import { Button, Container, Row, Col, Form, Offcanvas, Modal, ProgressBar, ListGroup } from 'react-bootstrap';
+import { Button, Container, Row, Col, Form, Offcanvas, Modal, ProgressBar, ListGroup, Dropdown } from 'react-bootstrap';
 import styled from 'styled-components';
 import 'bootstrap/dist/css/bootstrap.min.css'
 
@@ -400,6 +400,15 @@ const HomePage = () => {
                     <Button variant="primary" className="mt-2" onClick={handleShowModal}>
                         Generation Info
                     </Button>
+                    <Dropdown className="mt-2">
+                        <Dropdown.Toggle variant="primary" id="dropdown-edit">
+                            Edit Data
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu>
+                            <Dropdown.Item href="/edit/memes" target="_blank">Memes</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </Offcanvas.Body>
             </StyledOffcanvas>
             <StyledModal show={showModal} onHide={handleCloseModal}>

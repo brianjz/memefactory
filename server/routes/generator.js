@@ -255,7 +255,7 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
     if(generatorType === "flux" || generatorType === "comfy") {
         try {
             if(generatorType === "flux") {
-                finalPrompt = finalPrompt.replace("__recv/celeb/main-fav__", "")
+                finalPrompt = finalPrompt.replace(process.env.SD_PROMPT_ADDITION, "")
             }
             let generatorData = {
                 "imageGenerator": generatorType,
@@ -300,7 +300,7 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
                 "cfg_scale": 3.5,
                 "clip_skip": 1,
                 "width": "768",
-                "height": "512",
+                "height": "560",
                 "detailer": true,
                 "save_images_before_detailer": false,
                 "detailer_model": "Detailer",
@@ -314,7 +314,7 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
                 "detailer_blur": 10,
                 "detailer_strength": 0.35,
                 "detailer_models": [
-                    "face-yolo8n"
+                    "yolov8n-face"
                 ],
                 "refiner_steps": 20,
                 "save_images": true,
