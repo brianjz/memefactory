@@ -357,7 +357,13 @@ indexRouter.get('/api/memes', async (req, res) => {
 
 indexRouter.post('/api/meme/update', async (req, res) => {
   try {
-    const updatedItem = await models.memes.update(req.body, {
+    const updatedData = Object.fromEntries(
+      Object.entries(req.body).map(([key, value]) => 
+        [key, value === '' ? null : value]
+      )
+    );
+
+    const updatedItem = await models.memes.update(updatedData, {
       where: { id: req.body.id }
     });
     res.json(updatedItem);
@@ -369,7 +375,13 @@ indexRouter.post('/api/meme/update', async (req, res) => {
 
 indexRouter.post('/api/meme/new', async (req, res) => {
   try {
-    const createdItem = await models.memes.create(req.body);
+    const updatedData = Object.fromEntries(
+      Object.entries(req.body).map(([key, value]) => 
+        [key, value === '' ? null : value]
+      )
+    );
+
+    const createdItem = await models.memes.create(updatedData);
     res.json(createdItem);
   } catch (error) {
     console.error(error);
@@ -392,7 +404,13 @@ indexRouter.get('/api/messages', async (req, res) => {
 
 indexRouter.post('/api/message/update', async (req, res) => {
   try {
-    const updatedItem = await models.messages.update(req.body, {
+    const updatedData = Object.fromEntries(
+      Object.entries(req.body).map(([key, value]) => 
+        [key, value === '' ? null : value]
+      )
+    );
+
+    const updatedItem = await models.messages.update(updatedData, {
       where: { id: req.body.id }
     });
     res.json(updatedItem);
@@ -404,7 +422,13 @@ indexRouter.post('/api/message/update', async (req, res) => {
 
 indexRouter.post('/api/message/new', async (req, res) => {
   try {
-    const createdItem = await models.messages.create(req.body);
+    const updatedData = Object.fromEntries(
+      Object.entries(req.body).map(([key, value]) => 
+        [key, value === '' ? null : value]
+      )
+    );
+
+    const createdItem = await models.messages.create(updatedData);
     res.json(createdItem);
   } catch (error) {
     console.error(error);

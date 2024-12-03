@@ -11,7 +11,7 @@ function EditMessagesPage() {
     const [editingItem, setEditingItem] = useState(null);
     const [newItem, setNewItem] = useState({ 
         message: '', 
-        msgtype: '' ,
+        msgtype: 'quote' ,
         flagged: 0
     });
 
@@ -30,7 +30,7 @@ function EditMessagesPage() {
 }, []);
 
 const handleNewItemClick = () => {
-    setNewItem({ message: '', msgtype: '', flagged: 0 });
+    setNewItem({ message: '', msgtype: 'quote', flagged: 0 });
 };
 
 const handleNewItemChange = (event) => {
