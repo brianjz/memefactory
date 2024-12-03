@@ -131,6 +131,13 @@ const HomePage = () => {
         setADMode(qryADMode)
 
         fetchRandomImage();
+
+        const loadFont = async () => {
+            const font = new FontFace('Impact Regular', 'url(impact.woff)');
+            await font.load();
+            document.fonts.add(font); 
+        }
+        loadFont();
     }, []);
 
     useEffect(() => {
