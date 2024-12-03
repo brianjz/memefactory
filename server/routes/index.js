@@ -23,9 +23,10 @@ let includesBadWord = false;
 async function replaceBracketedWords(msg, models, seed) {
   // console.log("ORIG SEED: "+seed)
   const rng = seedrandom(seed);
-  const pattern = /\[([\w\|\s|;]+)\]/g;
+  const pattern = /\[([\w\|\s|;|\-]+)\]/g;
   const promises = [];
 
+  console.log(msg)
   // First pass: Find all bracketed sections and create Promises
   msg.replace(pattern, (match, type) => {
     const promise = (async () => {
