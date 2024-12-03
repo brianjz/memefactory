@@ -4,7 +4,7 @@ const { Model, Sequelize } = _sequelize;
 export default class messages extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    int: {
+    id: {
       autoIncrement: true,
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
@@ -33,7 +33,7 @@ export default class messages extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "int" },
+          { name: "id" },
         ]
       },
     ]
