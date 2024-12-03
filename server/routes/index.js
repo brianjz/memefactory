@@ -310,32 +310,6 @@ indexRouter.get('/api/random/prompt/:generator/:seed?', async (req, res) => {
   }
 });
 
-indexRouter.get('/api/random/style/:seed/:type?', async (req, res) => {
-  let styletype = req.params.type ?? "";
-  const seed = req.params.seed ?? 1234
-  try {
-    let whereClause = ""
-    if(styletype !== "") {
-      if(styletype.charAt(0) === "!") {
-        styletype = sequelize.escape(styletype.substring(1))
-        whereClause = ` WHERE styletype != ${styletype}`
-      } else {
-        styletype = sequelize.escape(styletype)
-        whereClause = ` WHERE styletype = ${styletype}`
-      }
-    }
-    const rand = await sequelize.query(
-      `SELECT outputstring FROM recv.sd_styles${whereClause} ORDER BY RAND(${seed}) LIMIT 1`, 
-      { type: sequelize.QueryTypes.SELECT }
-    );
-
-    res.json(rand[0]);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to fetch random style' });
-  }
-});
-
 indexRouter.get('/api/savedimages', async (req, res) => {
   const directoryPath = process.env.FINAL_DIR
   try {
@@ -395,7 +369,7 @@ indexRouter.post('/api/meme/update', async (req, res) => {
 
 indexRouter.post('/api/meme/new', async (req, res) => {
   try {
-    const createdItem = await models.memes.create(req.body); // Replace YourModel with your Sequelize model
+    const createdItem = await models.memes.create(req.body);
     res.json(createdItem);
   } catch (error) {
     console.error(error);
@@ -405,53 +379,71 @@ indexRouter.post('/api/meme/new', async (req, res) => {
 
 indexRouter.get('/api/messages', async (req, res) => {
   try {
-    const users = await models.messages.findAll({
-      order: ['message']
-    });  
-
-    res.json(users);
+    const memes = await models.messages.findAll({
+      order: Sequelize.literal('message ASC') 
+    });
+    
+    res.json(memes);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch messages' });
   }
 });
 
-indexRouter.get('/api/message', async (req, res) => {
+indexRouter.post('/api/message/update', async (req, res) => {
   try {
-    const rand = await models.messages.findOne({
-      order: Sequelize.literal('RAND()') 
+    const updatedItem = await models.messages.update(req.body, {
+      where: { id: req.body.id }
     });
-    
-    res.json(rand);
+    res.json(updatedItem);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to fetch random message' });
+    res.status(500).json({ error: 'Failed to update message' });
+  }
+});
+
+indexRouter.post('/api/message/new', async (req, res) => {
+  try {
+    const createdItem = await models.messages.create(req.body);
+    res.json(createdItem);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create new message' });
   }
 });
 
 indexRouter.get('/api/words', async (req, res) => {
   try {
-    const users = await models.words.findAll({
-      order: ['word']
-    });  
-
-    res.json(users);
+    const memes = await models.words.findAll({
+      order: Sequelize.literal('wordtype ASC, word ASC') 
+    });
+    
+    res.json(memes);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch words' });
   }
 });
 
-indexRouter.get('/api/word', async (req, res) => {
+indexRouter.post('/api/word/update', async (req, res) => {
   try {
-    const rand = await models.words.findOne({
-      order: Sequelize.literal('RAND()')
+    const updatedItem = await models.words.update(req.body, {
+      where: { id: req.body.id }
     });
-    
-    res.json(rand);
+    res.json(updatedItem);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to fetch random word' });
+    res.status(500).json({ error: 'Failed to update word' });
+  }
+});
+
+indexRouter.post('/api/word/new', async (req, res) => {
+  try {
+    const createdItem = await models.words.create(req.body);
+    res.json(createdItem);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create new word' });
   }
 });
 

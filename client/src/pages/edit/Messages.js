@@ -6,20 +6,19 @@ const MainTable = styled.table`
 
 `
 
-function EditMemesPage() {
+function EditMessagesPage() {
     const [data, setData] = useState([]);
     const [editingItem, setEditingItem] = useState(null);
     const [newItem, setNewItem] = useState({ 
-        topline: '', 
-        bottomline: '' ,
-        extra: '',
+        message: '', 
+        msgtype: '' ,
         flagged: 0
     });
 
     useEffect(() => {
         const fetchData = async () => {
         try {
-            const response = await fetch('/api/memes');
+            const response = await fetch('/api/messages');
             const jsonData = await response.json();
             setData(jsonData);
         } catch (error) {
@@ -31,7 +30,7 @@ function EditMemesPage() {
 }, []);
 
 const handleNewItemClick = () => {
-    setNewItem({ topline: '', bottomline: '', extra: '', flagged: 0 });
+    setNewItem({ message: '', msgtype: '', flagged: 0 });
 };
 
 const handleNewItemChange = (event) => {
@@ -59,7 +58,7 @@ const handleInputChange = (event) => {
 
 const handleSaveClick = async () => {
     try {
-        const response = await fetch('/api/meme/update', {
+        const response = await fetch('/api/message/update', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -88,7 +87,7 @@ const handleCreateClick = async () => {
             flagged: newItem.flagged ? 1 : 0,
         };
 
-        const response = await fetch('/api/meme/new', {
+        const response = await fetch('/api/message/new', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -119,9 +118,8 @@ return (
             <thead>
                 <tr>
                     <th></th> 
-                    <th>Top Line</th>
-                    <th>Bottom Line</th>
-                    <th>Extra</th>
+                    <th>Message</th>
+                    <th>Message Type</th>
                     <th>Flagged</th>
                 </tr>
             </thead>
@@ -140,23 +138,16 @@ return (
                         </td>
                         <td>
                             {editingItem?.id === item.id ? (
-                                <input type="text" name="topline" value={editingItem.topline} onChange={handleInputChange} />
+                                <input type="text" name="message" value={editingItem.message} onChange={handleInputChange} />
                             ) : (
-                                item.topline
+                                item.message
                             )}
                         </td>
                         <td>
                             {editingItem?.id === item.id ? (
-                                <input type="text" name="bottomline" value={editingItem.bottomline} onChange={handleInputChange} />
+                                <input type="text" name="msgtype" value={editingItem.msgtype} onChange={handleInputChange} />
                             ) : (
-                                item.bottomline
-                            )}
-                        </td>
-                        <td>
-                            {editingItem?.id === item.id ? (
-                                <input type="text" name="extra" value={editingItem.extra} onChange={handleInputChange} />
-                            ) : (
-                                item.extra
+                                item.msgtype
                             )}
                         </td>
                         <td>
@@ -176,13 +167,12 @@ return (
             <Card.Body>
                 <Col md="12">
                 <InputGroup className="mb-3">
-                <Form.Control name="topline" value={newItem.topline} onChange={handleNewItemChange} placeholder="Top Line" />
-                <Form.Control name="bottomline" value={newItem.bottomline} onChange={handleNewItemChange} placeholder="Bottom Line" />
+                <Form.Control name="message" value={newItem.message} onChange={handleNewItemChange} placeholder="Message" />
+                <Form.Control name="msgtype" value={newItem.msgtype} onChange={handleNewItemChange} placeholder="Message Type" />
+                <button onClick={handleCreateClick}>Create</button>
                 </InputGroup>
                 </Col>
-                <Col md="8">
-                <InputGroup className="mb-3">
-                <Form.Control name="extra" value={newItem.extra} onChange={handleNewItemChange} placeholder="Extra" />
+                <Col md="3">
                 <Form.Check
                     type="switch"
                     id="new-flagged"
@@ -192,8 +182,6 @@ return (
                     onChange={handleNewItemChange}
                     className="mx-2"
                 />
-                <button onClick={handleCreateClick}>Create</button>
-                </InputGroup>
                 </Col>
             </Card.Body>
         </Card>
@@ -203,4 +191,4 @@ return (
     );
 }
 
-export default EditMemesPage;
+export default EditMessagesPage;

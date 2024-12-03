@@ -6,20 +6,19 @@ const MainTable = styled.table`
 
 `
 
-function EditMemesPage() {
+function EditWordsPage() {
     const [data, setData] = useState([]);
     const [editingItem, setEditingItem] = useState(null);
     const [newItem, setNewItem] = useState({ 
-        topline: '', 
-        bottomline: '' ,
-        extra: '',
-        flagged: 0
+        word: '', 
+        wordtype: '' ,
+        useInPrompt: 1
     });
 
     useEffect(() => {
         const fetchData = async () => {
         try {
-            const response = await fetch('/api/memes');
+            const response = await fetch('/api/words');
             const jsonData = await response.json();
             setData(jsonData);
         } catch (error) {
@@ -31,7 +30,7 @@ function EditMemesPage() {
 }, []);
 
 const handleNewItemClick = () => {
-    setNewItem({ topline: '', bottomline: '', extra: '', flagged: 0 });
+    setNewItem({ word: '', wordtype: '', useInPrompt: 1 });
 };
 
 const handleNewItemChange = (event) => {
@@ -59,7 +58,7 @@ const handleInputChange = (event) => {
 
 const handleSaveClick = async () => {
     try {
-        const response = await fetch('/api/meme/update', {
+        const response = await fetch('/api/word/update', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -88,7 +87,7 @@ const handleCreateClick = async () => {
             flagged: newItem.flagged ? 1 : 0,
         };
 
-        const response = await fetch('/api/meme/new', {
+        const response = await fetch('/api/word/new', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -119,10 +118,9 @@ return (
             <thead>
                 <tr>
                     <th></th> 
-                    <th>Top Line</th>
-                    <th>Bottom Line</th>
-                    <th>Extra</th>
-                    <th>Flagged</th>
+                    <th>Word</th>
+                    <th>Word Type</th>
+                    <th>Use In Prompt</th>
                 </tr>
             </thead>
             <tbody>
@@ -140,30 +138,23 @@ return (
                         </td>
                         <td>
                             {editingItem?.id === item.id ? (
-                                <input type="text" name="topline" value={editingItem.topline} onChange={handleInputChange} />
+                                <input type="text" name="word" value={editingItem.word} onChange={handleInputChange} />
                             ) : (
-                                item.topline
+                                item.word
                             )}
                         </td>
                         <td>
                             {editingItem?.id === item.id ? (
-                                <input type="text" name="bottomline" value={editingItem.bottomline} onChange={handleInputChange} />
+                                <input type="text" name="wordtype" value={editingItem.wordtype} onChange={handleInputChange} />
                             ) : (
-                                item.bottomline
+                                item.wordtype
                             )}
                         </td>
                         <td>
                             {editingItem?.id === item.id ? (
-                                <input type="text" name="extra" value={editingItem.extra} onChange={handleInputChange} />
+                                <input type="number" max="1" min="0" style={{width: "50px"}} name="useInPrompt" value={editingItem.useInPrompt} onChange={handleInputChange} />
                             ) : (
-                                item.extra
-                            )}
-                        </td>
-                        <td>
-                            {editingItem?.id === item.id ? (
-                                <input type="number" max="1" min="0" style={{width: "50px"}} name="flagged" value={editingItem.flagged} onChange={handleInputChange} />
-                            ) : (
-                                item.flagged === 0 ? "No" : "Yes"
+                                item.useInPrompt === 0 ? "No" : "Yes"
                             )}
                         </td>
                     </tr>
@@ -176,24 +167,21 @@ return (
             <Card.Body>
                 <Col md="12">
                 <InputGroup className="mb-3">
-                <Form.Control name="topline" value={newItem.topline} onChange={handleNewItemChange} placeholder="Top Line" />
-                <Form.Control name="bottomline" value={newItem.bottomline} onChange={handleNewItemChange} placeholder="Bottom Line" />
+                <Form.Control name="word" value={newItem.word} onChange={handleNewItemChange} placeholder="Word" />
+                <Form.Control name="wordtype" value={newItem.wordtype} onChange={handleNewItemChange} placeholder="Word Type" />
+                <button onClick={handleCreateClick}>Create</button>
                 </InputGroup>
                 </Col>
-                <Col md="8">
-                <InputGroup className="mb-3">
-                <Form.Control name="extra" value={newItem.extra} onChange={handleNewItemChange} placeholder="Extra" />
+                <Col md="3">
                 <Form.Check
                     type="switch"
-                    id="new-flagged"
-                    name="flagged"
-                    label="Is Flagged?"
-                    checked={newItem.flagged}
+                    id="new-useInPrompt"
+                    name="useInPrompt"
+                    label="Use In Prompt?"
+                    checked={newItem.useInPrompt}
                     onChange={handleNewItemChange}
                     className="mx-2"
                 />
-                <button onClick={handleCreateClick}>Create</button>
-                </InputGroup>
                 </Col>
             </Card.Body>
         </Card>
@@ -203,4 +191,4 @@ return (
     );
 }
 
-export default EditMemesPage;
+export default EditWordsPage;

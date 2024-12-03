@@ -407,6 +407,8 @@ const HomePage = () => {
 
                         <Dropdown.Menu>
                             <Dropdown.Item href="/edit/memes" target="_blank">Memes</Dropdown.Item>
+                            <Dropdown.Item href="/edit/messages" target="_blank">Messages</Dropdown.Item>
+                            <Dropdown.Item href="/edit/words" target="_blank">Words</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </Offcanvas.Body>
