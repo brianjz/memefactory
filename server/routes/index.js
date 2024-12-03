@@ -48,6 +48,10 @@ async function replaceBracketedWords(msg, models, seed) {
       const chance = Math.floor(rng() * 101);
       if(chance > 50 || orig === "" || spl.length > 2) {
         // seed++
+        // console.log("SPL => "+spl)
+        // console.log("ReplW => "+replacedWords)
+        const wordseed = rng.int32() // debugging seed issues
+        const randomWordData = await getRandomWordFromDatabase(foundString, models, wordseed)
         if(spl.length > 2) { // if repeating an existing replacement
           let loc = parseInt(spl[2])
           randomWord = replacedWords[loc];
@@ -55,8 +59,6 @@ async function replaceBracketedWords(msg, models, seed) {
             randomWord = orig // stopgap to prevent undefined
           }
         } else {
-          const wordseed = rng.int32() // debugging seed issues
-          const randomWordData = await getRandomWordFromDatabase(foundString, models, wordseed)
           if(randomWordData["useInPrompt"] === 0) {
             includesBadWord = true
           }
@@ -64,6 +66,7 @@ async function replaceBracketedWords(msg, models, seed) {
           if(singularModifier) {
             randomWord = randomWord.substring(randomWord.indexOf(" ")+1)
           }
+          // console.log("RW => "+randomWord)
           replacedWords.push(randomWord)
         }
       }
