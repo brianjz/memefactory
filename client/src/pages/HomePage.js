@@ -133,7 +133,7 @@ const HomePage = () => {
         fetchRandomImage();
 
         const loadFont = async () => {
-            const font = new FontFace('Impact Regular', 'url(impact.woff)');
+            const font = new FontFace('Impact Regular', 'url(impact.woff2)');
             await font.load();
             document.fonts.add(font); 
         }
