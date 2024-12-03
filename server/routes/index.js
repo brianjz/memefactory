@@ -23,19 +23,24 @@ let includesBadWord = false;
 async function replaceBracketedWords(msg, models, seed) {
   // console.log("ORIG SEED: "+seed)
   const rng = seedrandom(seed);
-  const pattern = /\[([\w\|\s|;|\-]+)\]/g;
+  const pattern = /\[([\w\!\|\s|;|\-]+)\]/g;
   const promises = [];
 
-  console.log(msg)
+  console.log("ORIG MSG => "+msg)
   // First pass: Find all bracketed sections and create Promises
-  msg.replace(pattern, (match, type) => {
+  msg.replace(pattern, (match, foundString) => {
     const promise = (async () => {
       let orig = "";
       let spl = [];
-      if (type.includes("|")) {
-        spl = type.split("|");
-        type = spl[0];
+      let singularModifier = false
+      if (foundString.includes("|")) {
+        spl = foundString.split("|");
+        foundString = spl[0];
         orig = spl[1];
+      }
+      if (foundString.indexOf("!") > -1) {
+        foundString = foundString.substring(0, foundString.length-1)
+        singularModifier = true
       }
 
       // Fetch a random word from the database based on the type
@@ -43,8 +48,6 @@ async function replaceBracketedWords(msg, models, seed) {
       const chance = Math.floor(rng() * 101);
       if(chance > 50 || orig === "" || spl.length > 2) {
         // seed++
-        const wordseed = rng.int32() // debugging seed issues
-        const randomWordData = await getRandomWordFromDatabase(type, models, wordseed)
         if(spl.length > 2) { // if repeating an existing replacement
           let loc = parseInt(spl[2])
           randomWord = replacedWords[loc];
@@ -52,10 +55,15 @@ async function replaceBracketedWords(msg, models, seed) {
             randomWord = orig // stopgap to prevent undefined
           }
         } else {
+          const wordseed = rng.int32() // debugging seed issues
+          const randomWordData = await getRandomWordFromDatabase(foundString, models, wordseed)
           if(randomWordData["useInPrompt"] === 0) {
             includesBadWord = true
           }
           randomWord = randomWordData["word"]
+          if(singularModifier) {
+            randomWord = randomWord.substring(randomWord.indexOf(" ")+1)
+          }
           replacedWords.push(randomWord)
         }
       }
