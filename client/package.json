@@ -20,7 +20,7 @@
     "url": "^0.11.4"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "*"
+    "@babel/plugin-proposal-private-property-in-object": ""
   },
   "scripts": {
     "start": "react-scripts start",
