@@ -134,7 +134,7 @@ const HomePage = () => {
 
         const loadFont = async () => {
             try {
-                const font = new FontFace('Impact Regular', 'url(impact.woff)', {
+                const font = new FontFace('Impact Regular', 'url(Impact2.woff2)', {
                   crossOrigin: 'anonymous'
                 });
             
