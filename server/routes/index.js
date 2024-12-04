@@ -122,8 +122,10 @@ async function getRandomWordFromDatabase(wordTypeString, seed) {
         where: { wordtype: { [Op.in]: types } },
         order: Sequelize.literal('RAND('+seed+')'),
       });
-      // console.log(randomWord)
-      if(singularModified.includes(randomWord["wordtype"])) {
+      // console.log("RW => "+randomWord["word"]+" -- "+randomWord["wordtype"])
+      // console.log("SM => "+singularModified)
+      if(singularModified.includes(randomWord["wordtype"].toUpperCase())) {
+        console.log("===> Singular Modified")
         randomWord["word"] = randomWord["word"].substring(randomWord["word"].indexOf(" ")+1)
       }
     }

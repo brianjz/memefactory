@@ -121,7 +121,7 @@ const HomePage = () => {
     }, []);
 
     useEffect(() => {
-        const fetchRandomImage = async () => {
+        const fetchRecentImage = async () => {
             const randomImage = await getRandomSavedFile("top");
             setImageData(process.env.REACT_APP_SAVED_DIR + randomImage);
             setIsLoading(false)
@@ -130,17 +130,16 @@ const HomePage = () => {
         const qryADMode = ad !== null
         setADMode(qryADMode)
 
-        fetchRandomImage();
+        fetchRecentImage();
 
         const loadFont = async () => {
             try {
                 const font = new FontFace('Impact Regular', 'url(Impact.woff2)', {
-                  crossOrigin: 'anonymous'
+                    crossOrigin: 'anonymous'
                 });
             
-                // Add this line to check if the font is already loaded
                 if (document.fonts.check('12px "Impact Regular"')) { 
-                  console.log('Font is already loaded.');
+                    console.log('Font is already loaded.');
                   return; // Font is already loaded, no need to load again
                 }
             
