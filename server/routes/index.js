@@ -41,7 +41,7 @@ async function replaceBracketedWords(msg, seed) {
       // Fetch a random word from the database based on the type
       let randomWord = orig
       const chance = Math.floor(rng() * 101);
-      if(chance > 50 || orig === "" || spl.length > 2) {
+      if(chance > 35 || orig === "" || spl.length > 2) {
         // seed++
         // console.log("SPL => "+spl)
         // console.log("ReplW => "+replacedWords)
