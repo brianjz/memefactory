@@ -189,7 +189,6 @@ indexRouter.post('/api/save-image/:type?', (req, res) => {
 });
 
 export async function getRandomMessage(imageType, seed, override = "") {
-  // console.log("SEED:"+seed)
   const rng = seedrandom(seed);
   seed = parseInt(seed)
   includesBadWord = false;
@@ -221,14 +220,14 @@ export async function getRandomMessage(imageType, seed, override = "") {
           order: Sequelize.literal('RAND('+seed+')')
         });
       }
-      outputString = await replaceBracketedWords(msgType === "message" ? rand.message : rand.lyric, models, seed);
+      outputString = await replaceBracketedWords(msgType === "message" ? rand.message : rand.lyric, seed);
 
       seed = seed + 1;
       const randTitle = await models.words.findOne({
         order: Sequelize.literal('RAND('+seed+')')
       });
 
-      const finalTitle = await replaceBracketedWords(randTitle.word, models, seed);
+      const finalTitle = await replaceBracketedWords(randTitle.word, seed);
       
       outputString = outputString.charAt(0).toUpperCase() + outputString.slice(1);
       if(randTitle.useInPrompt === 0 || rand.flagged === 1) {
@@ -249,7 +248,7 @@ export async function getRandomMessage(imageType, seed, override = "") {
       // console.log("MEME => "+randomMeme)
       extra = result[0][0].extra ? (Math.floor(rng() * 101) > 50 ? result[0][0].extra: "") : ""
       
-      randomMeme = await replaceBracketedWords(randomMeme, models, seed);
+      randomMeme = await replaceBracketedWords(randomMeme, seed);
       randomMeme = randomMeme.toUpperCase()
       // console.log(randomMeme)
       const memeParts = randomMeme.split('||')
@@ -285,7 +284,7 @@ indexRouter.get('/api/random/lyric/:seed?', async (req, res) => {
       order: Sequelize.literal('RAND('+seed+')')
     });
 
-    let outputString = await replaceBracketedWords(rand.lyric, models, seed);
+    let outputString = await replaceBracketedWords(rand.lyric, seed);
     outputString = outputString.charAt(0).toUpperCase() + outputString.slice(1);
 
     res.json({"message": outputString, "includesBadWord": includesBadWord});
