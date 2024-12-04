@@ -133,7 +133,9 @@ const HomePage = () => {
         fetchRandomImage();
 
         const loadFont = async () => {
-            const font = new FontFace('Impact Regular', 'url(impact.woff2)');
+            const font = new FontFace('Impact Regular', 'url(impact.woff2)', {
+                crossOrigin: 'anonymous'  // Add the crossorigin property here
+            });
             await font.load();
             document.fonts.add(font); 
         }
