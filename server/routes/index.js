@@ -200,7 +200,7 @@ export async function getRandomMessage(imageType, seed, override = "") {
   if(override !== "") {
     console.log(imageType.toUpperCase()+" OVERRIDE")
     let replacedString = await replaceBracketedWords(override, seed)
-    replacedString = imageType === "meme" ? replacedString.toUpperCase() : replaceString
+    replacedString = imageType === "meme" ? replacedString.toUpperCase() : replacedString
     const stringParts = replacedString.split('|')
     title = stringParts[0]
     outputString = stringParts[1]
