@@ -183,7 +183,7 @@ const HomePage = () => {
             let seed = parseInt(settings.seed)
             if(seed === -1) {
                 const min = 0;
-                const max = Number.MAX_SAFE_INTEGER;
+                const max = Math.pow(2, 32) - 1
                 
                 seed = Math.floor(Math.random() * (max - min + 1)) + min;
             }
