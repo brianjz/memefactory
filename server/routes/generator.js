@@ -106,21 +106,13 @@ async function getMessage(imageType, seed, override, llm = "local", adMode) {
 
 async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "local") {
     llmData["seed"] = seed
-    if(generatorType === "sd15" || generatorType === "comfy") {
-        userPrompt = userPrompt.replace("Prompt Examples:",`Prompt Examples (short, brief phrases separated by commas):
-            - skinny male fantasy scientist, long dark hair, 1920s, elegant, highly detailed, intricate, smooth, sharp focus, artstation, digital paining, concept art, art by donato giancola, greg rutkowski, artgerm, cedric peyravernay
-            - vibrant tapestry of humanity, a group portrait, diverse faces, (varied ages), warm smiles, laughter lines, curious eyes, sunlight dappling through leaves, vibrant clothing, textures of silk and cotton, hands intertwined, a sense of connection, unity, and shared joy, intricate details, photorealistic, golden hour light
-            - portrait of a mech warrior, female, fantasy, circuitry, explosion, dramatic, intricate, elegant, highly detailed, digital painting, artstation, concept art, smooth, sharp focus, illustration, by piotr rusnarczyk
-            - a complex ancient alchemists interior, 4k, stone table, giant athanor, alembic, beakers full of liquid, knobs, glass orbs, candle lighting, octane render, natural color scheme, architectural photography, f 32, still from movie by david lynch`)
-    } else if(generatorType === "flux") {
-        userPrompt = userPrompt.replace("Prompt Examples:",`Prompt Examples:
-            - A woman with soft, tousled hair reclines in a plush velvet armchair in a cozy hotel room, her face relaxed and serene, looking into the camera with a flirty smirk. She wears worn unbuttoned jeans and an oversized sweater. A guitar leans against the chair, and a cup of steaming tea sits on the side table. The room is bathed in a soft, warm glow from a candle, casting gentle shadows and creating a romantic, intimate atmosphere. The lighting is soft and diffused, with a warm, golden hue, enhancing the cozy, nostalgic feel. The background elements are gently out of focus, adding to the serene, dreamy quality. The scene is framed with a slight film grain, giving it a timeless, cinematic look inspired by the visual style of director Wes Anderson.
-            - In an ancient enchanted forest with hazy sky and mountainous terrain, a centered subject stands on a balcony railing, eye-level shot with clear perspective. The figure, with fair skin and flowing dark hair, wears an ethereal, flowing gown. A gentle, serene expression on their face as they gaze into the distance. The background features lush, verdant foliage with a triadic Earth Tone palette. Backlighting adds depth, casting a soft, warm glow around the figure. The scene is painted in an impressionistic style with a blue palette, reminiscent of John Singer Sargent's work. Cinematic and sensual, the lighting setup includes a warm, golden backlight and soft, diffused sidelights, creating a natural point rose hue. Film grain and subtle color grading enhance the mystical atmosphere.
-            - In a hazy, mountainous realm under a twilight sky, an ancient, enchanted forest stretches endlessly. A balcony railing frames the centered subject, with a straight, eye-level shot offering a clear perspective. Triadic and earth-tone colors blend harmoniously, enhanced by a blue palette and backlighting that adds depth. The scene, painted in an impressionistic style reminiscent of John Singer Sargent, is both cinematic and sensual, with a natural point of rose. CGI art by Tove Jansson captures the magic and mystery of this otherworldly place.
-            `)
-        userPrompt = userPrompt.replace("Stable Diffusion 1.5", "Flux")
-        // llmData["max_length"] = 150
-    }
+    const promptExamples = generatorType === "flux" ? JSON.parse(process.env.FLUX_PROMPT_EXAMPLES) : JSON.parse(process.env.SD_PROMPT_EXAMPLES);
+    let peString = generatorType === "flux" ? "Prompt Examples:\n" : "Prompt Examples (short, brief phrases separated by commas):\n"
+    promptExamples.forEach(str => {
+        peString += "- " + str + "\n";
+    });
+    userPrompt = userPrompt.replace("Prompt Examples:", peString)
+    userPrompt = generatorType === "flux" ? userPrompt.replace("Stable Diffusion 1.5", "Flux") : userPrompt
     llmData["prompt"] = userPrompt
 
     let finalPrompt = ""
