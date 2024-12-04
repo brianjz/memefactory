@@ -8,7 +8,7 @@ const GlobalStyle = createGlobalStyle`
         font-family: 'Impact Regular';
         font-style: normal;
         font-weight: normal;
-        src: local('Impact Regular'), url('impact.woff2') format('woff2 ');
+        src: local('Impact Regular'), url('impact.woff') format('woff');
     }
 
     html {

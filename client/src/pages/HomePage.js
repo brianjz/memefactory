@@ -133,11 +133,22 @@ const HomePage = () => {
         fetchRandomImage();
 
         const loadFont = async () => {
-            const font = new FontFace('Impact Regular', 'url(impact.woff2)', {
-                crossOrigin: 'anonymous'  // Add the crossorigin property here
-            });
-            await font.load();
-            document.fonts.add(font); 
+            try {
+                const font = new FontFace('Impact Regular', 'url(impact.woff)', {
+                  crossOrigin: 'anonymous'
+                });
+            
+                // Add this line to check if the font is already loaded
+                if (document.fonts.check('12px "Impact Regular"')) { 
+                  console.log('Font is already loaded.');
+                  return; // Font is already loaded, no need to load again
+                }
+            
+                await font.load();
+                document.fonts.add(font);
+            } catch (error) {
+                console.error('Error loading font:', error);
+            }
         }
         loadFont();
     }, []);
