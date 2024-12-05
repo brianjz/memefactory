@@ -49,6 +49,9 @@ Follow these steps to create the prompt:
 
     Return only the prompt. Avoid returning descriptive information.
 `
+
+const fluxPrompt = process.env.FLUX_LLM_PROMPT
+
 const temp = 0.7
 const topP = 0.9
 const topK = 40
@@ -70,29 +73,36 @@ const llmData = {
     "bypass_eos": false
 }
 
-async function getMessage(imageType, seed, override, llm = "local", adMode) {
+async function getMessage(imageType, generator, seed, override, llm = "local", adMode) {
     let userPrompt = ""            
     let messageResponse = { message: override.toUpperCase(), "includesBadWord": false }
     const msg = await getRandomMessage(imageType, seed, override)
-    console.log(`MSG ==> ${msg.title} | ${msg.outputString}`)
+    // console.log(`MSG ==> ${msg.title} | ${msg.outputString}`)
 
     const modifier = adMode ? `, ${process.env.LLM_PROMPT_ADDITION} ,` : ""
     const extra = msg.extra !== "" ? ` Prompt should also involve '${msg.extra}'` : ""
+    let llmPrompt = generator === "flux" ? fluxPrompt : sdPrompt
     if(llm === "local") {
         if(imageType === "meme") {
+            const instruct = generator === "flux" ? "" : `Create a prompt for the meme phrase`
             let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title
-            userPrompt = `${startsys}\n${sdPrompt}\n${startuser}\nCreate a prompt for the meme phrase${modifier}'${memeMsg}'.${extra}\n${ending}${startresp}\n`
+            userPrompt = `${startsys}\n${llmPrompt}\n${startuser}\n${instruct}${modifier}'${memeMsg}'.${extra}\n${ending}${startresp}\n`
         } else {
-            userPrompt = `${startsys}\n${sdPrompt}\n${startuser}\nCreate a prompt for the an image based on the phrase${modifier}'${msg.title}' heavily affected by the phrase '${msg.outputString}.${extra}'\n${ending}${startresp}\n`
+            llmPrompt = llmPrompt.replace('meme', 'motivational poster')
+            const instruct = generator === "flux" ? "" : `Create a prompt for the an image based on the phrase`
+            userPrompt = `${startsys}\n${llmPrompt}\n${startuser}\n${instruct}${modifier}'${msg.title}' heavily affected by the phrase '${msg.outputString}.${extra}'\n${ending}${startresp}\n`
         }
     } else {
         if(imageType === "meme") {
+            const instruct = generator === "flux" ? "" : `Create a prompt for the meme phrase`
             let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title
-            userPrompt = `${sdPrompt}\nCreate a prompt for the meme phrase${modifier} '${memeMsg}'${extra}`
+            userPrompt = `${llmPrompt}\n${instruct}${modifier} '${memeMsg}'${extra}`
         } else {
-            userPrompt = `${sdPrompt}\nCreate a prompt for the an image based on the phrase${modifier} '${msg.title}' heavily affected by the phrase '${msg.outputString}'${extra}`
+            llmPrompt = llmPrompt.replace('meme', 'motivational poster')
+            const instruct = generator === "flux" ? "" : `Create a prompt for the an image based on the phrase`
+            userPrompt = `${llmPrompt}\n${instruct}${modifier} '${msg.title}' heavily affected by the phrase '${msg.outputString}'${extra}`
         }
-        userPrompt = userPrompt + " Do not use square brackets or curly brackets. Try not to use a surreal description."
+        // userPrompt = userPrompt + " Do not use square brackets or curly brackets. Try not to use a surreal description."
     }
 
     let hasBadWord = msg.includesBadWord
@@ -105,15 +115,17 @@ async function getMessage(imageType, seed, override, llm = "local", adMode) {
 
 async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "local") {
     llmData["seed"] = seed
-    const promptExamples = generatorType === "flux" ? JSON.parse(process.env.FLUX_PROMPT_EXAMPLES) : JSON.parse(process.env.SD_PROMPT_EXAMPLES);
-    let peString = generatorType === "flux" ? "Prompt Examples:\n" : "Prompt Examples (short, brief phrases separated by commas):\n"
-    promptExamples.forEach(str => {
-        peString += "- " + str + "\n";
-    });
-    userPrompt = userPrompt.replace("Prompt Examples:", peString)
-    userPrompt = generatorType === "flux" ? userPrompt.replace("Stable Diffusion 1.5", "Flux") : userPrompt
+    if(generatorType !== "flux") {
+        const promptExamples = JSON.parse(process.env.SD_PROMPT_EXAMPLES);
+        let peString = "Prompt Examples (short, brief phrases separated by commas):\n"
+        promptExamples.forEach(str => {
+            peString += "- " + str + "\n";
+        });
+        userPrompt = userPrompt.replace("Prompt Examples:", peString)
+    }
     llmData["prompt"] = userPrompt
 
+    // console.log("LLM PROMPT ==> "+userPrompt)
     let finalPrompt = ""
     let titleOverride = ""
     let msgOverride = ""
@@ -149,7 +161,6 @@ async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "loca
                 model: "gemini-1.5-flash",
                 generationConfig: {
                     candidateCount: 1,
-                    maxOutputTokens: max_tokens,
                     temperature: temp,
                     topP: topP,
                     topK: topK
@@ -188,7 +199,7 @@ generatorRouter.post('/getPrompt/:llm/:generator/:type/:seed', async (req, res, 
     const override = req.body.override ?? ""
     const adMode = req.body.adMode && req.body.adMode !== 0
     try {
-        const messageData = await getMessage(imageType, seed, override, llm, adMode)
+        const messageData = await getMessage(imageType, generator, seed, override, llm, adMode)
         // console.log("MSG => "+messageData.userPrompt)
         let finalPrompt = "Error"
         if(!messageData.includesBadWord && llm !== "none") {
