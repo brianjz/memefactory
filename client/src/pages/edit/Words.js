@@ -14,11 +14,12 @@ function EditWordsPage() {
         wordtype: '' ,
         useInPrompt: 1
     });
+    const [wordType, setWordType] = useState("NOUN")
 
     useEffect(() => {
         const fetchData = async () => {
         try {
-            const response = await fetch('/api/words');
+            const response = await fetch('/api/words/noun');
             const jsonData = await response.json();
             setData(jsonData);
         } catch (error) {
@@ -109,10 +110,45 @@ const handleCreateClick = async () => {
     }
 };
 
+const handleWordSelect = async (event) => {
+    const selection = event.target.value
+
+    setWordType(selection)
+
+    try {
+        const response = await fetch('/api/words/'+selection);
+        const jsonData = await response.json();
+        setData(jsonData);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
 
 return (
 <Container data-bs-theme="dark">
-    <Row>
+    <Row className="justify-content-around">
+    <Col className="col-4 mb-2">
+    <Form.Label htmlFor="generator">Word Type</Form.Label>
+        <Form.Select 
+            aria-label="Word Type"
+            name="wordtype"
+            value={wordType}
+            onChange={handleWordSelect}
+        >
+            <option value="NOUN">Noun</option>
+            <option value="PLURAL">Plural Noun</option>
+            <option value="ADJ">Adjective</option>
+            <option value="VERB">Verb</option>
+            <option value="VERBING">Verb ending in "ing"</option>
+            <option value="PERSON">General Person</option>
+            <option value="PROPERNAME">Proper Name</option>
+            <option value="PLACE">Place</option>
+            <option value="TITLE">Title</option>
+        </Form.Select>
+    </Col>
+    <Col md="8" style={{ 'text-align': 'right'}}>
+        <a href="#addNew" className="btn btn-secondary">Add New</a>
+    </Col>
     <Col md="12" className="mb-2">
         <MainTable className="table table-striped" data-bs-theme="dark">
             <thead>
@@ -154,7 +190,7 @@ return (
                             {editingItem?.id === item.id ? (
                                 <input type="number" max="1" min="0" style={{width: "50px"}} name="useInPrompt" value={editingItem.useInPrompt} onChange={handleInputChange} />
                             ) : (
-                                item.useInPrompt === 0 ? "No" : "Yes"
+                                item.useInPrompt === 0 ? <span style={{ color: 'red' }}>No</span>  : "Yes"
                             )}
                         </td>
                     </tr>
@@ -162,7 +198,7 @@ return (
             </tbody>
         </MainTable>
 
-        <h2>Add New Item</h2>
+        <h2 id="addNew">Add New Item</h2>
         <Card>
             <Card.Body>
                 <Col md="12">

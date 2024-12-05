@@ -460,9 +460,13 @@ indexRouter.post('/api/message/new', async (req, res) => {
   }
 });
 
-indexRouter.get('/api/words', async (req, res) => {
+indexRouter.get('/api/words/:wordtype?', async (req, res) => {
+  const wordType = req.params.wordtype ?? ""
+
+  const wh = wordType !== "" ? { wordtype: wordType } : {}
   try {
     const memes = await models.words.findAll({
+      where: wh,
       order: Sequelize.literal('wordtype ASC, word ASC') 
     });
     

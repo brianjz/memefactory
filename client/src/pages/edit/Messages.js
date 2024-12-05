@@ -113,6 +113,9 @@ const handleCreateClick = async () => {
 return (
 <Container data-bs-theme="dark">
     <Row>
+    <Col md="12" className="mb-2" style={{ 'text-align': 'right'}}>
+        <a href="#addNew" className="btn btn-secondary">Add New</a>
+    </Col>
     <Col md="12" className="mb-2">
         <MainTable className="table table-striped" data-bs-theme="dark">
             <thead>
@@ -162,7 +165,7 @@ return (
             </tbody>
         </MainTable>
 
-        <h2>Add New Item</h2>
+        <h2 id="addNew">Add New Item</h2>
         <Card>
             <Card.Body>
                 <Col md="12">

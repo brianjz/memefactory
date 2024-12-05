@@ -28,9 +28,9 @@ Follow these steps to create the prompt:
         b. Varied Style Keywords: Incorporating a diverse range of keywords related to art style, photography techniques, and desired aesthetics (e.g., "cinematic", "Pixar-style", "photorealistic", "minimalist", "surrealism").
         c. Artistic References: Integrating specific artists, art movements, or pop culture references to guide the AI's stylistic interpretation.
         d. Optional Technical Details: Including optional yet specific details about:
-            - Camera and Lens: "Canon EOS R5", "Nikon D850 with a macro lens", "35mm lens at f/8"
-            - Film Stock: "Kodak film", "Fujifilm Provia"
-            - Post-Processing: "Film grain", "lens aberration", "color negative", "bokeh."
+            - Camera and Lens examples: "Canon EOS R5", "Nikon D850 with a macro lens", "35mm lens at f/8"
+            - Film Stock examples: "Kodak film", "Fujifilm Provia"
+            - Post-Processing examples: "Film grain", "lens aberration", "color negative", "bokeh."
         e. Emphasis Techniques: Utilizing parentheses, brackets, or capitalization to highlight key elements within the prompt.
     2. User-Centric Design:
         a. Clarity and Specificity: The generated prompts should be clear, specific, and easily understood by the AI.
@@ -67,7 +67,6 @@ const llmData = {
     "top_k": topK,
     "top_p": topP,
     "typical": 1,
-    "stop_sequence": ["### Instruction:","### End Response","### Response:","[Description ends here]","[END]", "###","[]","[EOF]"],
     "bypass_eos": false
 }
 
