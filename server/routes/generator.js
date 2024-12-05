@@ -200,7 +200,7 @@ generatorRouter.post('/getPrompt/:llm/:generator/:type/:seed', async (req, res, 
     const adMode = req.body.adMode && req.body.adMode !== 0
     try {
         const messageData = await getMessage(imageType, generator, seed, override, llm, adMode)
-        // console.log("MSG => "+messageData.userPrompt)
+        console.log("MSG => "+messageData.userPrompt)
         let finalPrompt = "Error"
         if(!messageData.includesBadWord && llm !== "none") {
             finalPrompt = await buildPrompt(messageData.userPrompt, seed, generator, llm)
