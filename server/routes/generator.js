@@ -2,6 +2,7 @@ import express from 'express'
 import * as dotenv from 'dotenv';
 import { getRandomMessage, getRandomPrompt } from './index.js';
 import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, FinishReason } from "@google/generative-ai";
+import fs from 'fs'
 
 dotenv.config(); 
 const generatorRouter = express.Router();
@@ -297,32 +298,11 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
                 "cfg_scale": 3.5,
                 "clip_skip": 1,
                 "width": "768",
-                "height": "560",
-                "detailer": true,
-                "save_images_before_detailer": false,
-                "detailer_model": "Detailer",
-                "detailer_classes": "",
-                "detailer_conf": 0.5,
-                "detailer_max": 4,
-                "detailer_iou": 0.5,
-                "detailer_min_size": 0.05,
-                "detailer_max_size": 1,
-                "detailer_padding": 32,
-                "detailer_blur": 10,
-                "detailer_strength": 0.35,
-                "detailer_models": [
-                    "yolov8n-face"
-                ],
-                "refiner_steps": 20,
-                "save_images": true,
-                "alwayson_scripts": {
-                    "aarecv toolbox": {
-                        "args": [
-                            false, "", "", "", "", "", "", "", "", "", "", "", "", "", "", false
-                        ]
-                    }
-                }
+                "height": "560"
             }
+
+            const extraSettings = JSON.parse(fs.readFileSync('routes/sdextra.json'));
+            sdData = { ...sdData, ...extraSettings }; 
 
             const imageCreation = await fetch(`${process.env.LOCAL_SD_API}/txt2img`, {
                 method: 'POST',
