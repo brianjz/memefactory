@@ -316,7 +316,7 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
                 "refiner_steps": 20,
                 "save_images": true,
                 "alwayson_scripts": {
-                    "recv toolbox": {
+                    "aarecv toolbox": {
                         "args": [
                             false, "", "", "", "", "", "", "", "", "", "", "", "", "", "", false
                         ]
