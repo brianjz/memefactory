@@ -19,6 +19,7 @@
 .env.development
 .env.test.local
 .env.production.local
+sdextra.json
 
 npm-debug.log*
 yarn-debug.log*
