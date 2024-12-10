@@ -19,37 +19,47 @@ const startuser = "<|im_start|>user";
 const ending = "";
 // const ending = "<end_of_turn>";
 
-const sdPrompt = `
-You are an AI model that is highly skilled at Stable Diffusion 1.5 Prompt Generation. You will generate a creative and detailed image prompt based on a user's request, emulating the distinctive style and structure observed in example prompts. The system will aim for accuracy, detail, and flexibility, ensuring the generated prompts are suitable for use with AI image generator Stable Diffusion 1.5. The prompt should be consist of a short paragraph. Only respond with a single prompt. The created image should no include text.
+const sdPrompt=`
+I will be providing you with text from a meme.  Translate this meme into a concise and evocative scene description, formatted as a prompt for an AI image generator like Stable Diffusion.
 
-Follow these steps to create the prompt:
+    Capture the essence: Don't just literally depict the text. Instead, interpret the meme's humor or message through creative visual elements. Feel free to be metaphorical or symbolic!
+    Prioritize keywords and phrases: Focus on using impactful keywords and short phrases to describe the scene, characters, and objects. Think like an artist sketching out a quick concept.
+    Diversify artistic styles: Suggest specific art styles (e.g., Art Deco, Surrealism, photorealistic) or artists (e.g., "in the style of Greg Rutkowski") to guide the AI's aesthetic. Avoid overusing any single artist or style, and make sure the chosen style aligns with the meme's tone.
+    Technical details: Naturally incorporate keywords that influence the image's qualities throughout your description. Think about lighting ("golden hour lighting," "dramatic shadows"), composition ("close-up," "wide angle"), and details ("intricate," "highly detailed"). Avoid explicitly listing keywords or creating a separate "Keywords" section.
 
-    1. Faithful Style Replication: You will prioritize mirroring the nuanced style of the examples. This includes:
-        a. Concise Subject Introduction: Starting with a clear and brief subject or scene description.
-        b. Varied Style Keywords: Incorporating a diverse range of keywords related to art style, photography techniques, and desired aesthetics (e.g., "cinematic", "Pixar-style", "photorealistic", "minimalist", "surrealism").
-        c. Artistic References: Integrating specific artists, art movements, or pop culture references to guide the AI's stylistic interpretation.
-        d. Optional Technical Details: Including optional yet specific details about:
-            - Camera and Lens examples: "Canon EOS R5", "Nikon D850 with a macro lens", "35mm lens at f/8"
-            - Film Stock examples: "Kodak film", "Fujifilm Provia"
-            - Post-Processing examples: "Film grain", "lens aberration", "color negative", "bokeh."
-        e. Emphasis Techniques: Utilizing parentheses, brackets, or capitalization to highlight key elements within the prompt.
-    2. User-Centric Design:
-        a. Clarity and Specificity: The generated prompts should be clear, specific, and easily understood by the AI.
-    3. Comprehensive Prompt Structure:
-        a. Subject: Clearly define the primary subject(s) of the image.
-        b. Action/Pose: Describe actions or poses the subject(s) might be performing.
-        c. Environment/Background: Establish the scene's setting, including background elements.
-        d. Style/Art Medium: Specify the desired artistic style or medium (photography, illustration, painting, pixel art, etc.).
-        e. Lighting: Detail the lighting conditions (soft light, dramatic light, natural light, studio lighting, etc.).
-        f. Color Palette: Suggest a specific color palette or individual colors.
-        g. Composition: Indicate the preferred composition (close-up, wide-angle, symmetrical, minimalist, etc.).
-        h. Details/Texture: Include descriptions of textures, patterns, and specific features.
-        i. Mood/Atmosphere: Optionally evoke a mood or atmosphere to guide the AI's interpretation (melancholic, mysterious, serene, etc.)
-
-    Please follow these Prompt Examples:
-
-    Return only the prompt. Avoid returning descriptive information.
+The output should be a concise, single-paragraph prompt ready for use in Stable Diffusion, with a natural, flowing structure of keywords and phrases. Avoid full sentences, extra formatting, or comments.
 `
+// const sdPrompt = `
+// You are an AI model that is highly skilled at Stable Diffusion 1.5 Prompt Generation. You will generate a creative and detailed image prompt based on a user's request, emulating the distinctive style and structure observed in example prompts. The system will aim for accuracy, detail, and flexibility, ensuring the generated prompts are suitable for use with AI image generator Stable Diffusion 1.5. The prompt should be consist of a short paragraph. Only respond with a single prompt. The created image should no include text.
+
+// Follow these steps to create the prompt:
+
+//     1. Faithful Style Replication: You will prioritize mirroring the nuanced style of the examples. This includes:
+//         a. Concise Subject Introduction: Starting with a clear and brief subject or scene description.
+//         b. Varied Style Keywords: Incorporating a diverse range of keywords related to art style, photography techniques, and desired aesthetics (e.g., "cinematic", "Pixar-style", "photorealistic", "minimalist", "surrealism").
+//         c. Artistic References: Integrating specific artists, art movements, or pop culture references to guide the AI's stylistic interpretation.
+//         d. Optional Technical Details: Including optional yet specific details about:
+//             - Camera and Lens examples: "Canon EOS R5", "Nikon D850 with a macro lens", "35mm lens at f/8"
+//             - Film Stock examples: "Kodak film", "Fujifilm Provia"
+//             - Post-Processing examples: "Film grain", "lens aberration", "color negative", "bokeh."
+//         e. Emphasis Techniques: Utilizing parentheses, brackets, or capitalization to highlight key elements within the prompt.
+//     2. User-Centric Design:
+//         a. Clarity and Specificity: The generated prompts should be clear, specific, and easily understood by the AI.
+//     3. Comprehensive Prompt Structure:
+//         a. Subject: Clearly define the primary subject(s) of the image.
+//         b. Action/Pose: Describe actions or poses the subject(s) might be performing.
+//         c. Environment/Background: Establish the scene's setting, including background elements.
+//         d. Style/Art Medium: Specify the desired artistic style or medium (photography, illustration, painting, pixel art, etc.).
+//         e. Lighting: Detail the lighting conditions (soft light, dramatic light, natural light, studio lighting, etc.).
+//         f. Color Palette: Suggest a specific color palette or individual colors.
+//         g. Composition: Indicate the preferred composition (close-up, wide-angle, symmetrical, minimalist, etc.).
+//         h. Details/Texture: Include descriptions of textures, patterns, and specific features.
+//         i. Mood/Atmosphere: Optionally evoke a mood or atmosphere to guide the AI's interpretation (melancholic, mysterious, serene, etc.)
+
+//     Please follow these Prompt Examples:
+
+//     Return only the prompt. Avoid returning descriptive information.
+// `
 
 const fluxPrompt = process.env.FLUX_LLM_PROMPT
 
@@ -93,7 +103,7 @@ async function getMessage(imageType, generator, seed, override, llm = "local", a
             const instruct = generator === "flux" ? "" : `Create a prompt for the an image based on the phrase`
             userPrompt = `${startsys}\n${llmPrompt}\n${startuser}\n${instruct}${modifier}'${msg.title}' heavily affected by the phrase '${msg.outputString}.${extra}'\n${ending}${startresp}\n`
         }
-    } else {
+    } else { // Gemini
         if(imageType === "meme") {
             const instruct = generator === "flux" ? "" : `Create a prompt for the meme phrase`
             let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title
@@ -122,11 +132,11 @@ async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "loca
         promptExamples.forEach(str => {
             peString += "- " + str + "\n";
         });
-        userPrompt = userPrompt.replace("Prompt Examples:", peString)
+        userPrompt = userPrompt + "\n\n" + peString
     }
     llmData["prompt"] = userPrompt
 
-    // console.log("LLM PROMPT ==> "+userPrompt)
+    // console.log("LLM PROMPT ==> "+llmData["prompt"])
     let finalPrompt = ""
     let titleOverride = ""
     let msgOverride = ""
