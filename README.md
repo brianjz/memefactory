@@ -12,7 +12,7 @@ It started as a sort of *proof of concept* in PHP and went from there, so it kee
 
 ## Details
 
-Example .env files are included showing the enviroment variables that are used.
+Example .env files are included showing the environment variables that are used.
 
 I use sequelize with a local MySQL server, but you should be able to change it to whatever you need. Models are included for the database tables I use, so you should be able to recreate them. They were built and added on to sort of ranomly, so they don't really follow a standard.
 
