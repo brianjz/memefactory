@@ -24,7 +24,7 @@ I will be providing you with text from a meme.  Translate this meme into a conci
 
     Capture the essence: Don't just literally depict the text. Instead, interpret the meme's humor or message through creative visual elements. Feel free to be metaphorical or symbolic!
     Prioritize keywords and phrases: Focus on using impactful keywords and short phrases to describe the scene, characters, and objects. Think like an artist sketching out a quick concept.
-    Diversify artistic styles: Suggest specific art styles (e.g., Art Deco, Surrealism, photorealistic) or artists (e.g., "in the style of Greg Rutkowski") to guide the AI's aesthetic. Avoid overusing any single artist or style, and make sure the chosen style aligns with the meme's tone.
+    Flexible artistic styles: Suggest a visual style for the AI. This should lean more towards a more general approach like "photorealistic," "cinematic," or "realistic." but it could also be a specific art style (e.g., Art Deco, Surrealism) or an artist's name (e.g., "in the style of Greg Rutkowski"). Ensure the chosen style aligns with the meme's tone. Avoid overusing any single artist or style.
     Technical details: Naturally incorporate keywords that influence the image's qualities throughout your description. Think about lighting ("golden hour lighting," "dramatic shadows"), composition ("close-up," "wide angle"), and details ("intricate," "highly detailed"). Avoid explicitly listing keywords or creating a separate "Keywords" section.
 
 The output should be a concise, single-paragraph prompt ready for use in Stable Diffusion, with a natural, flowing structure of keywords and phrases. Avoid full sentences, extra formatting, or comments.
@@ -99,7 +99,7 @@ async function getMessage(imageType, generator, seed, override, llm = "local", a
             let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title
             userPrompt = `${startsys}\n${llmPrompt}\n${startuser}\n${instruct}${modifier}'${memeMsg}'.${extra}\n${ending}${startresp}\n`
         } else {
-            llmPrompt = llmPrompt.replace('meme', 'motivational poster')
+            llmPrompt = llmPrompt.replaceAll('meme', 'motivational poster')
             const instruct = generator === "flux" ? "" : `Create a prompt for the an image based on the phrase`
             userPrompt = `${startsys}\n${llmPrompt}\n${startuser}\n${instruct}${modifier}'${msg.title}' heavily affected by the phrase '${msg.outputString}.${extra}'\n${ending}${startresp}\n`
         }
@@ -109,7 +109,7 @@ async function getMessage(imageType, generator, seed, override, llm = "local", a
             let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title
             userPrompt = `${llmPrompt}\n${instruct}${modifier} '${memeMsg}'${extra}`
         } else {
-            llmPrompt = llmPrompt.replace('meme', 'motivational poster')
+            llmPrompt = llmPrompt.replaceAll('meme', 'motivational poster')
             const instruct = generator === "flux" ? "" : `Create a prompt for the an image based on the phrase`
             userPrompt = `${llmPrompt}\n${instruct}${modifier} '${msg.title}' heavily affected by the phrase '${msg.outputString}'${extra}`
         }
@@ -327,7 +327,7 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
             image = returnedData["images"][0]
             const info = returnedData["info"]
             const usedPrompt = JSON.parse(info)["prompt"]
-            console.log("SD INFO => " + info)
+            // console.log("SD INFO => " + info)
             let imageData = { prompt: usedPrompt, image: image }
             return imageData
         } catch (error) {
