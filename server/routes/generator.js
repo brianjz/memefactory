@@ -126,6 +126,19 @@ async function getMessage(imageType, generator, seed, override, llm = "local", a
     return {title: msg.title, message: msg.outputString, userPrompt, includesBadWord: hasBadWord}
 }
 
+function removeLastBrokenSentence(text) {
+    const sentenceDelimiters = ['.', '!', '?'];
+    let lastSentenceEnd = 0;
+
+    for (const delimiter of sentenceDelimiters) {
+        const lastIndex = text.lastIndexOf(delimiter);
+        if (lastIndex > lastSentenceEnd) {
+            lastSentenceEnd = lastIndex + 1;
+        }
+    }
+    return text.substring(0, lastSentenceEnd);
+}
+
 async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "local") {
     llmData["seed"] = seed
     if(generatorType !== "flux") {
@@ -156,6 +169,7 @@ async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "loca
             const data1 = await llmImagePrompt.json();
         
             finalPrompt = data1["results"][0]["text"]
+            finalPrompt = removeLastBrokenSentence(finalPrompt) // local LLMs sometimes end in broken sentences when token limit is reached
             console.log("LOCAL LLM => "+finalPrompt);
         } else if (llm === "gemini") {
             const safetySettings = [
