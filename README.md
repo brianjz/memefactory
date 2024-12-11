@@ -25,7 +25,7 @@ Where `[PLURAL]` is the type of item in the `word` table that will be replaced. 
 
 > Don't leave [PLACE|home] without it!
 
-A pipe in after the type with the original word will allow the site to give an equal change of pulling the original word or a replacement word.
+A pipe in after the type with the original word will allow the site to give an equal chance of pulling the original word or a replacement word.
 
 > Don't compare your [NOUN] to someone else's [NOUN||0].
 
