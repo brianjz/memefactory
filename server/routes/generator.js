@@ -20,10 +20,10 @@ const ending = "";
 // const ending = "<end_of_turn>";
 
 const sdPrompt=`
-I will be providing you with text from a meme.  Translate this meme into a concise and evocative scene description, formatted as a prompt for an AI image generator like Stable Diffusion.
+I will be providing you with text from a meme.  Translate this meme into a concise and evocative image description, formatted as a prompt for an AI image generator like Stable Diffusion.
 
     Capture the essence: Don't just literally depict the text. Instead, interpret the meme's humor or message through creative visual elements. Feel free to be metaphorical or symbolic!
-    Prioritize keywords and phrases: Focus on using impactful keywords and short phrases to describe the scene, characters, and objects. Think like an artist sketching out a quick concept.
+    Prioritize keywords and phrases: Focus on using impactful keywords and short phrases to describe the image, characters, and objects. Think like an artist sketching out a quick concept.
     Flexible artistic styles: Suggest a visual style for the AI. This should lean more towards a more general approach like "photorealistic," "cinematic," or "realistic." but it could also be a specific art style (e.g., Art Deco, Surrealism) or an artist's name (e.g., "in the style of Greg Rutkowski"). Ensure the chosen style aligns with the meme's tone. Avoid overusing any single artist or style.
     Technical details: Naturally incorporate keywords that influence the image's qualities throughout your description. Think about lighting ("golden hour lighting," "dramatic shadows"), composition ("close-up," "wide angle"), and details ("intricate," "highly detailed"). Avoid explicitly listing keywords or creating a separate "Keywords" section.
 
