@@ -117,8 +117,7 @@ const HomePage = () => {
             setSettings(JSON.parse(storedSettings));
             settings.seed = -1
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         const fetchRecentImage = async () => {
