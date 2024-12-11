@@ -28,6 +28,8 @@ I will be providing you with text from a meme.  Translate this meme into a conci
     Technical details: Naturally incorporate keywords that influence the image's qualities throughout your description. Think about lighting ("golden hour lighting," "dramatic shadows"), composition ("close-up," "wide angle"), and details ("intricate," "highly detailed"). Avoid explicitly listing keywords or creating a separate "Keywords" section.
 
 The output should be a concise, single-paragraph prompt ready for use in Stable Diffusion, with a natural, flowing structure of keywords and phrases. Avoid full sentences, extra formatting, or comments.
+
+###
 `
 // const sdPrompt = `
 // You are an AI model that is highly skilled at Stable Diffusion 1.5 Prompt Generation. You will generate a creative and detailed image prompt based on a user's request, emulating the distinctive style and structure observed in example prompts. The system will aim for accuracy, detail, and flexibility, ensuring the generated prompts are suitable for use with AI image generator Stable Diffusion 1.5. The prompt should be consist of a short paragraph. Only respond with a single prompt. The created image should no include text.
@@ -132,7 +134,7 @@ async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "loca
         promptExamples.forEach(str => {
             peString += "- " + str + "\n";
         });
-        userPrompt = userPrompt + "\n\n" + peString
+        userPrompt = userPrompt.replace("###", peString)
     }
     llmData["prompt"] = userPrompt
 
