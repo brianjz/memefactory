@@ -9,11 +9,8 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
-    "debug": "~2.6.9",
     "dotenv": "^16.0.3",
     "express": "~4.16.1",
-    "http-errors": "~1.6.3",
-    "mysql2": "^3.11.4",
     "nodemon": "^2.0.22",
     "seedrandom": "^3.0.5",
     "sequelize": "^6.37.5"
