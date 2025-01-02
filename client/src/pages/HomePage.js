@@ -376,6 +376,7 @@ const HomePage = () => {
                     >
                         <option value="none">None</option>
                         <option value="local">Local</option>
+                        <option value="runpod">Runpod</option>
                         {!adMode && <option value="gemini">Gemini 1.5 Flash</option>}
                     </Form.Select>
 

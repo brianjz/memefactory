@@ -158,8 +158,9 @@ async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "loca
     if(titleOverride !== "") {
         finalPrompt = `${titleOverride}|${msgOverride}`
     } else {
-        if(llm === "local") {
-            const llmImagePrompt = await fetch(process.env.LOCAL_LLM_API, {
+        if(llm === "local" || llm === "runpod") {
+            let llmApi = llm === "local" ? process.env.LOCAL_LLM_API : process.env.RUNPOD_LLM_API
+            const llmImagePrompt = await fetch(llmApi, {
                 method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json',
@@ -277,9 +278,11 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
     let image = ""
     if(generatorType === "flux" || generatorType === "comfy") {
         try {
+            finalPrompt = finalPrompt.trimStart();
             if(generatorType === "flux") {
                 finalPrompt = finalPrompt.replace(process.env.SD_PROMPT_ADDITION, "")
             }
+            // console.log(finalPrompt)
             let generatorData = {
                 "imageGenerator": generatorType,
                 "port": port,
@@ -287,6 +290,7 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
                 "prompt": finalPrompt,
                 "checkpoint": checkpoint
             }
+            // console.log(generatorData)
             const imageCreation = await fetch(process.env.COMFY_API, {
                 method: 'POST',
                 headers: {
@@ -298,7 +302,7 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
 
             return imageData
         } catch (error) {
-            console.error('Error calling Flux:', error);
+            console.error(`Error calling ${generatorType}:`, error);
         }
     } else if(generatorType === "sd15") {
         try {
