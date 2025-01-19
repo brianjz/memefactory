@@ -362,7 +362,8 @@ const HomePage = () => {
                         value={settings.generator}
                         onChange={handleSettingChange}
                     >
-                        <option value="flux">Flux</option>
+                        <option value="flux">Runpod Flux</option>
+                        <option value="flux-local">Local Flux</option>
                         <option value="sd15">Stable Diffusion 1.5</option>
                         <option value="comfy">ComfyUI</option>
                     </Form.Select>

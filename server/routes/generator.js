@@ -94,25 +94,25 @@ async function getMessage(imageType, generator, seed, override, llm = "local", a
 
     const modifier = adMode ? `, ${process.env.LLM_PROMPT_ADDITION} ,` : ""
     const extra = msg.extra !== "" ? ` Prompt should also involve '${msg.extra}'` : ""
-    let llmPrompt = generator === "flux" ? fluxPrompt : sdPrompt
+    let llmPrompt = generator.indexOf("flux") > -1 ? fluxPrompt : sdPrompt
     if(llm === "local") {
         if(imageType === "meme") {
-            const instruct = generator === "flux" ? "" : `Create a prompt for the meme phrase`
+            const instruct = generator.indexOf("flux") > -1 ? "" : `Create a prompt for the meme phrase`
             let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title
             userPrompt = `${startsys}\n${llmPrompt}\n${startuser}\n${instruct}${modifier}'${memeMsg}'.${extra}\n${ending}${startresp}\n`
         } else {
             llmPrompt = llmPrompt.replaceAll('meme', 'motivational poster')
-            const instruct = generator === "flux" ? "" : `Create a prompt for the an image based on the phrase`
+            const instruct = generator.indexOf("flux") > -1 ? "" : `Create a prompt for the an image based on the phrase`
             userPrompt = `${startsys}\n${llmPrompt}\n${startuser}\n${instruct}${modifier}'${msg.title}' heavily affected by the phrase '${msg.outputString}.${extra}'\n${ending}${startresp}\n`
         }
     } else { // Gemini
         if(imageType === "meme") {
-            const instruct = generator === "flux" ? "" : `Create a prompt for the meme phrase`
+            const instruct = generator.indexOf("flux") > -1 ? "" : `Create a prompt for the meme phrase`
             let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title
             userPrompt = `${llmPrompt}\n${instruct}${modifier} '${memeMsg}'${extra}`
         } else {
             llmPrompt = llmPrompt.replaceAll('meme', 'motivational poster')
-            const instruct = generator === "flux" ? "" : `Create a prompt for the an image based on the phrase`
+            const instruct = generator.indexOf("flux") > -1 ? "" : `Create a prompt for the an image based on the phrase`
             userPrompt = `${llmPrompt}\n${instruct}${modifier} '${msg.title}' heavily affected by the phrase '${msg.outputString}'${extra}`
         }
         // userPrompt = userPrompt + " Do not use square brackets or curly brackets. Try not to use a surreal description."
@@ -141,7 +141,7 @@ function removeLastBrokenSentence(text) {
 
 async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "local") {
     llmData["seed"] = seed
-    if(generatorType !== "flux") {
+    if(generatorType.indexOf("flux") == -1) {
         const promptExamples = JSON.parse(process.env.SD_PROMPT_EXAMPLES);
         let peString = "Prompt Examples (short, brief phrases separated by commas):\n"
         promptExamples.forEach(str => {
@@ -276,10 +276,10 @@ generatorRouter.post('/getImage/:generator/:seed', async (req, res, next) => {
 
 async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoint, port, adMode = false) {
     let image = ""
-    if(generatorType === "flux" || generatorType === "comfy") {
+    if(generatorType.indexOf("flux") > -1 || generatorType === "comfy") {
         try {
             finalPrompt = finalPrompt.trimStart();
-            if(generatorType === "flux") {
+            if(generatorType.indexOf("flux") > -1) {
                 finalPrompt = finalPrompt.replace(process.env.SD_PROMPT_ADDITION, "")
             }
             // console.log(finalPrompt)
@@ -290,7 +290,7 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
                 "prompt": finalPrompt,
                 "checkpoint": checkpoint
             }
-            // console.log(generatorData)
+            console.log(generatorData)
             const imageCreation = await fetch(process.env.COMFY_API, {
                 method: 'POST',
                 headers: {
