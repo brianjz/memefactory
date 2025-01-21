@@ -3,6 +3,7 @@
   "version": "0.7.0",
   "proxy": "http://localhost:3000",
   "private": true,
+  "homepage": "/memefactory",
   "dependencies": {
     "bootstrap": "^5.3.3",
     "canvas": "^2.11.2",

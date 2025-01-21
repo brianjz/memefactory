@@ -37,6 +37,6 @@ const router = createBrowserRouter([
         },
         ]
     },
-], { basename: "/" });
+], { basename: "/memefactory" });
 
 export default router;
