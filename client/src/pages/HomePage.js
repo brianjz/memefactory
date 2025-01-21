@@ -93,7 +93,6 @@ const HomePage = () => {
     const handleShowModal = () => setShowModal(true);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    // eslint-disable-next-line no-unused-vars
     const [timings, setTimings] = useState({
         getPrompt: null,
         generateImage: null,
@@ -117,7 +116,7 @@ const HomePage = () => {
             setSettings(JSON.parse(storedSettings));
             settings.seed = -1
         }
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         const fetchRecentImage = async () => {
@@ -197,7 +196,6 @@ const HomePage = () => {
             }
             let processExtended = ""
             if(includesBadWord) {
-                // eslint-disable-next-line no-unused-vars
                 useLLM = false
                 processExtended = " Skipped LLM."
             }
