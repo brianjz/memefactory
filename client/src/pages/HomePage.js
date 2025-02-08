@@ -322,7 +322,7 @@ const HomePage = () => {
                 <Button variant={isOrigSaved ? "success" : "outline-secondary"} className={"me-2" + (originalImage === "" ? " hidden" : "")} onClick={() => handleSaveImage(originalImage, 'orig')}>
                     {isOrigSaved ? 'SAVED!' : 'Save Original'}
                 </Button>
-                <Button variant="outline-info" href="/gallery" target="_blank">
+                <Button variant="outline-info" href="gallery" target="_blank">
                     Gallery
                 </Button>
             </Col>
@@ -424,10 +424,10 @@ const HomePage = () => {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item href="/edit/memes" target="_blank">Memes</Dropdown.Item>
-                            <Dropdown.Item href="/edit/messages" target="_blank">Messages</Dropdown.Item>
-                            <Dropdown.Item href="/edit/words" target="_blank">Words</Dropdown.Item>
-                            <Dropdown.Item href="/edit/lyrics" target="_blank">Lyrics</Dropdown.Item>
+                            <Dropdown.Item href="edit/memes" target="_blank">Memes</Dropdown.Item>
+                            <Dropdown.Item href="edit/messages" target="_blank">Messages</Dropdown.Item>
+                            <Dropdown.Item href="edit/words" target="_blank">Words</Dropdown.Item>
+                            <Dropdown.Item href="edit/lyrics" target="_blank">Lyrics</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </Offcanvas.Body>
