@@ -362,7 +362,7 @@ indexRouter.get('/api/random/savedimage/:spot?', async (req, res) => {
       return res.json({ file: randomFile}); // Return the full path
     } catch (error) {
       console.error('Error reading directory or selecting file:', error);
-      res.status(500).json({ error: 'Failed to fetch random file' });
+      res.status(500).json({ error: 'Failed to fetch random file' + error });
     }
 })
 
