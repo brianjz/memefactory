@@ -1,7 +1,7 @@
 import express from 'express'
 import * as dotenv from 'dotenv';
 import { getRandomMessage, getRandomPrompt } from './index.js';
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, FinishReason } from "@google/generative-ai";
+import { GoogleGenAI, HarmBlockThreshold, HarmCategory, FinishReason } from "@google/genai";
 import fs from 'fs'
 
 dotenv.config(); 
@@ -94,7 +94,7 @@ async function getMessage(imageType, generator, seed, override, llm = "local", a
 
     const modifier = adMode ? `, ${process.env.LLM_PROMPT_ADDITION} ,` : ""
     const extra = msg.extra !== "" ? ` Prompt should also involve '${msg.extra}'` : ""
-    let llmPrompt = generator.indexOf("flux") > -1 ? fluxPrompt : sdPrompt
+    let llmPrompt = generator.indexOf("flux") == -1 && generator != "zimage" ? sdPrompt : fluxPrompt
     if(llm === "local") {
         if(imageType === "meme") {
             const instruct = generator.indexOf("flux") > -1 ? "" : `Create a prompt for the meme phrase`
@@ -148,10 +148,18 @@ async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "loca
             peString += "- " + str + "\n";
         });
         userPrompt = userPrompt.replace("###", peString)
+    } else {
+        const promptExamples = JSON.parse(process.env.FLUX_PROMPT_EXAMPLES);
+        let peString = "Prompt Examples (short, brief phrases separated by commas):\n"
+        promptExamples.forEach(str => {
+            peString += "- " + str + "\n";
+        });
+        userPrompt = userPrompt.replace("###", peString)
+
     }
     llmData["prompt"] = userPrompt
 
-    // console.log("LLM PROMPT ==> "+llmData["prompt"])
+    console.log("LLM PROMPT ==> "+llmData["prompt"])
     let finalPrompt = ""
     let titleOverride = ""
     let msgOverride = ""
@@ -184,10 +192,12 @@ async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "loca
                 },
             ];
             
-            const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY);
-            const model = genAI.getGenerativeModel({ 
+            const genAI = new GoogleGenAI({apiKey: process.env.GEMINI_API_KEY});
+            // const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY);
+            const geminiResult = await genAI.models.generateContent({ 
                 model: "gemini-2.5-flash",
-                generationConfig: {
+                contents: llmData["prompt"],
+                config: {
                     candidateCount: 1,
                     temperature: temp,
                     topP: topP,
@@ -196,17 +206,19 @@ async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "loca
                 safetySettings: safetySettings
             });
 
-            const geminiResult = await model.generateContent(
-                llmData["prompt"],
-            );                
+            // const geminiResult = await model.generateContent(
+            //     llmData["prompt"],
+            // );                
             
-            const candidate = geminiResult.response.candidates[0]
+            // console.log(geminiResult.candidates[0].content.parts[0].text)
+            const candidate = geminiResult.candidates[0]
             if(candidate.finishReason !== FinishReason.STOP && candidate.finishReason !== FinishReason.MAX_TOKENS) {
                 console.log("Failed Gemini: " + candidate.finishReason)
                 return ""
             }
 
-            const responseText = geminiResult.response.text().replace("\n<|im_end|>","").replace(",  ", ", ").trim()
+            // const responseText = geminiResult.text().replace("\n<|im_end|>","").replace(",  ", ", ").trim()
+            const responseText = geminiResult.candidates[0].content.parts[0].text.trim();
             console.log("GEMINI => "+responseText);
             finalPrompt = responseText
         }
@@ -251,7 +263,7 @@ generatorRouter.post('/getPrompt/:llm/:generator/:type/:seed', async (req, res, 
 })
 
 generatorRouter.post('/getImage/:generator/:seed', async (req, res, next) => {
-    const generator = req.params.generator;  
+    const generator = req.params.generator;
     // const generator = "sd15"
     const seed = req.params.seed;
     const checkpoint = req.body.checkpoint ?? ""
@@ -276,7 +288,8 @@ generatorRouter.post('/getImage/:generator/:seed', async (req, res, next) => {
 
 async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoint, port, adMode = false) {
     let image = ""
-    if(generatorType.indexOf("flux") > -1 || generatorType === "comfy") {
+    const isNotSD = generatorType.indexOf("flux") > -1 || generatorType === "zimage" || generatorType === "comfy"
+    if(isNotSD) {
         try {
             finalPrompt = finalPrompt.trimStart();
             if(generatorType.indexOf("flux") > -1) {
@@ -290,7 +303,7 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
                 "prompt": finalPrompt,
                 "checkpoint": checkpoint
             }
-            console.log(generatorData)
+            // console.log(generatorData)
             const imageCreation = await fetch(process.env.COMFY_API, {
                 method: 'POST',
                 headers: {

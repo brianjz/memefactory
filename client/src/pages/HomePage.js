@@ -360,10 +360,11 @@ const HomePage = () => {
                         value={settings.generator}
                         onChange={handleSettingChange}
                     >
+                        <option value="zimage">Local Z-Image</option>
                         <option value="flux">Runpod Flux</option>
                         <option value="flux-local">Local Flux</option>
                         <option value="sd15">Stable Diffusion 1.5</option>
-                        <option value="comfy">ComfyUI</option>
+                        <option value="comfy">ComfyUI - SD1.5</option>
                     </Form.Select>
 
                     <Form.Label htmlFor="llm">LLM Generator</Form.Label>
@@ -376,7 +377,7 @@ const HomePage = () => {
                         <option value="none">None</option>
                         <option value="local">Local</option>
                         <option value="runpod">Runpod</option>
-                        {!adMode && <option value="gemini">Gemini 2.0 Flash</option>}
+                        {!adMode && <option value="gemini">Gemini 2.5 Flash</option>}
                     </Form.Select>
 
                     <Form.Label htmlFor="generator">Checkpoint (non flux)</Form.Label>
