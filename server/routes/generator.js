@@ -101,13 +101,17 @@ async function getMessage(imageType, generator, seed, override, llm = "local", a
     let llmPrompt = !enhancedPrompt ? sdPrompt : fluxPrompt
     if(llm === "local") {
         if(imageType === "meme") {
+            llmPrompt = llmPrompt + "\n\n" + process.env.FLUX_MEME_PROMPT + "\n"
             const instruct = enhancedPrompt ? "" : `Create a prompt for the meme phrase`
-            let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title
-            userPrompt = `${startsys}\n${llmPrompt}\n${startuser}\n${instruct}${modifier}'${memeMsg}'.${extra}\n${ending}${startresp}\n`
+            let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title.replace(" |", "")
+            memeMsg = `Theme to Visualize: ${memeMsg}\n\nFinal Reminder: Strictly NO TEXT in the image. Describe the scene only.`
+            userPrompt = `${startsys}\n${llmPrompt}\n${startuser}\n${instruct}\n${memeMsg}\n${modifier}.${extra}\n${ending}${startresp}\n`
         } else {
-            llmPrompt = llmPrompt.replaceAll('meme', 'motivational poster')
+            // llmPrompt = llmPrompt.replaceAll('meme', 'motivational poster')
+            llmPrompt = llmPrompt + "\n\n" + process.env.FLUX_MOT_PROMPT + "\n"
             const instruct = enhancedPrompt ? "" : `Create a prompt for the an image based on the phrase`
-            userPrompt = `${startsys}\n${llmPrompt}\n${startuser}\n${instruct}${modifier}'${msg.title}' heavily affected by the phrase '${msg.outputString}.${extra}'\n${ending}${startresp}\n`
+            const mpMsg = `Theme to Visualize: "${msg.title}" - Tone Phrase: "${msg.outputString}"\n\nFinal Reminder: Strictly NO TEXT in the image. Describe the scene only.`
+            userPrompt = `${startsys}\n${llmPrompt}\n${startuser}\n${instruct}\n${mpMsg}\n${extra}' ${modifier}\n${ending}${startresp}\n`
         }
     } else { // Gemini
         if(imageType === "meme") {
@@ -253,7 +257,7 @@ generatorRouter.post('/getPrompt/:llm/:generator/:type/:seed', async (req, res, 
         } else {
             finalPrompt = await getRandomPrompt("sd15", seed)
         }
-        finalPrompt = adMode ? `${process.env.SD_PROMPT_ADDITION}, ${finalPrompt}` : finalPrompt
+        // finalPrompt = adMode ? `${process.env.SD_PROMPT_ADDITION}, ${finalPrompt}` : finalPrompt
         const prompt = {prompt: finalPrompt, includesBadWord: messageData.includesBadWord, title: messageData.title, message: messageData.message}
 
         if (!res.headersSent) {
@@ -298,7 +302,7 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
     if(isNotSD) {
         try {
             finalPrompt = finalPrompt.trimStart();
-            if(generatorType.indexOf("flux") > -1) {
+            if(generatorType.indexOf("flux") > -1 || generatorType === "zimage") {
                 finalPrompt = finalPrompt.replace(process.env.SD_PROMPT_ADDITION, "")
             }
             // console.log(finalPrompt)
