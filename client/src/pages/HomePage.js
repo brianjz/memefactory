@@ -132,7 +132,8 @@ const HomePage = () => {
 
         const loadFont = async () => {
             try {
-                const font = new FontFace('Impact Regular', 'url(Impact.woff2)', {
+                const fontPath = `${process.env.PUBLIC_URL}/Impact.woff2`;
+                const font = new FontFace('Impact Regular', `url(${fontPath})`, {
                     crossOrigin: 'anonymous'
                 });
             

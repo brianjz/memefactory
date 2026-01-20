@@ -7,13 +7,13 @@ import fs from 'fs'
 dotenv.config(); 
 const generatorRouter = express.Router();
 
-const startsys = "<|im_start|>system";
+let startsys = "<|im_start|>system";
 // const startsys = "<start_of_turn>system";
 
-const startresp = "<|im_start|>assistant";
+let startresp = "<|im_start|>assistant";
 // const startresp = "<start_of_turn>model";
 
-const startuser = "<|im_start|>user";
+let startuser = "<|im_start|>user";
 // const startuser = "<start_of_turn>user";
 
 const ending = "";
@@ -29,7 +29,7 @@ I will be providing you with text from a meme.  Translate this meme into a conci
 
 The output should be a concise, single-paragraph prompt ready for use in Stable Diffusion, with a natural, flowing structure of keywords and phrases. Avoid full sentences, extra formatting, or comments.
 
-###
+#-#-#-#
 `
 // const sdPrompt = `
 // You are an AI model that is highly skilled at Stable Diffusion 1.5 Prompt Generation. You will generate a creative and detailed image prompt based on a user's request, emulating the distinctive style and structure observed in example prompts. The system will aim for accuracy, detail, and flexibility, ensuring the generated prompts are suitable for use with AI image generator Stable Diffusion 1.5. The prompt should be consist of a short paragraph. Only respond with a single prompt. The created image should no include text.
@@ -92,27 +92,31 @@ async function getMessage(imageType, generator, seed, override, llm = "local", a
     const msg = await getRandomMessage(imageType, seed, override)
     console.log(`MSG ==> ${msg.title} | ${msg.outputString}`)
 
+    const enhancedPrompt = generator.indexOf("flux") > -1 || generator == "zimage"
+    startsys = "### System:"
+    startresp = "### Assistant:"
+    startuser = "### User:"
     const modifier = adMode ? `, ${process.env.LLM_PROMPT_ADDITION} ,` : ""
     const extra = msg.extra !== "" ? ` Prompt should also involve '${msg.extra}'` : ""
-    let llmPrompt = generator.indexOf("flux") == -1 && generator != "zimage" ? sdPrompt : fluxPrompt
+    let llmPrompt = !enhancedPrompt ? sdPrompt : fluxPrompt
     if(llm === "local") {
         if(imageType === "meme") {
-            const instruct = generator.indexOf("flux") > -1 ? "" : `Create a prompt for the meme phrase`
+            const instruct = enhancedPrompt ? "" : `Create a prompt for the meme phrase`
             let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title
             userPrompt = `${startsys}\n${llmPrompt}\n${startuser}\n${instruct}${modifier}'${memeMsg}'.${extra}\n${ending}${startresp}\n`
         } else {
             llmPrompt = llmPrompt.replaceAll('meme', 'motivational poster')
-            const instruct = generator.indexOf("flux") > -1 ? "" : `Create a prompt for the an image based on the phrase`
+            const instruct = enhancedPrompt ? "" : `Create a prompt for the an image based on the phrase`
             userPrompt = `${startsys}\n${llmPrompt}\n${startuser}\n${instruct}${modifier}'${msg.title}' heavily affected by the phrase '${msg.outputString}.${extra}'\n${ending}${startresp}\n`
         }
     } else { // Gemini
         if(imageType === "meme") {
-            const instruct = generator.indexOf("flux") > -1 ? "" : `Create a prompt for the meme phrase`
+            const instruct = enhancedPrompt ? "" : `Create a prompt for the meme phrase`
             let memeMsg = msg.outputString !== "" ? `${msg.title} ${msg.outputString}` : msg.title
             userPrompt = `${llmPrompt}\n${instruct}${modifier} '${memeMsg}'${extra}`
         } else {
             llmPrompt = llmPrompt.replaceAll('meme', 'motivational poster')
-            const instruct = generator.indexOf("flux") > -1 ? "" : `Create a prompt for the an image based on the phrase`
+            const instruct = enhancedPrompt ? "" : `Create a prompt for the an image based on the phrase`
             userPrompt = `${llmPrompt}\n${instruct}${modifier} '${msg.title}' heavily affected by the phrase '${msg.outputString}'${extra}`
         }
         // userPrompt = userPrompt + " Do not use square brackets or curly brackets. Try not to use a surreal description."
@@ -123,6 +127,7 @@ async function getMessage(imageType, generator, seed, override, llm = "local", a
         console.log("ADMODE => skipping bad word flag")
         hasBadWord = false
     }
+    // console.log("USERPROMPT => "+userPrompt)
     return {title: msg.title, message: msg.outputString, userPrompt, includesBadWord: hasBadWord}
 }
 
@@ -141,22 +146,22 @@ function removeLastBrokenSentence(text) {
 
 async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "local") {
     llmData["seed"] = seed
-    if(generatorType.indexOf("flux") == -1) {
+    if(generatorType.indexOf("flux") == -1 && generatorType != "zimage") {
         const promptExamples = JSON.parse(process.env.SD_PROMPT_EXAMPLES);
         let peString = "Prompt Examples (short, brief phrases separated by commas):\n"
         promptExamples.forEach(str => {
             peString += "- " + str + "\n";
         });
-        userPrompt = userPrompt.replace("###", peString)
+        userPrompt = userPrompt.replace("#-#-#-#", peString)
     } else {
         const promptExamples = JSON.parse(process.env.FLUX_PROMPT_EXAMPLES);
         let peString = "Prompt Examples (short, brief phrases separated by commas):\n"
         promptExamples.forEach(str => {
             peString += "- " + str + "\n";
         });
-        userPrompt = userPrompt.replace("###", peString)
-
+        userPrompt = userPrompt.replace("#-#-#-#", peString)
     }
+    console.log("Generator => "+generatorType)
     llmData["prompt"] = userPrompt
 
     console.log("LLM PROMPT ==> "+llmData["prompt"])
@@ -177,6 +182,7 @@ async function buildPrompt(userPrompt, seed, generatorType = "flux", llm = "loca
             });
             const data1 = await llmImagePrompt.json();
         
+            // console.log(data1)
             finalPrompt = data1["results"][0]["text"]
             finalPrompt = removeLastBrokenSentence(finalPrompt) // local LLMs sometimes end in broken sentences when token limit is reached
             console.log("LOCAL LLM => "+finalPrompt);
@@ -303,7 +309,8 @@ async function generateImage(finalPrompt, seed, generatorType = "flux", checkpoi
                 "prompt": finalPrompt,
                 "checkpoint": checkpoint
             }
-            // console.log(generatorData)
+            console.log(generatorData)
+            console.log(process.env.COMFY_API)
             const imageCreation = await fetch(process.env.COMFY_API, {
                 method: 'POST',
                 headers: {
