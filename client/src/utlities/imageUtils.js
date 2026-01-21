@@ -2,8 +2,8 @@ import { createCanvas, loadImage } from 'canvas';
 
 export async function addTextToImage(base64Image, mainTitleText, messageText, msgType, generator) {
     // flux does 1024x768 and SD does 768x512, so font size looks different
-    let messageTopTextSize = generator === "flux" ? 60 : generator == "zimage" ? 72 : 54
-    let messageBottomTextSize = generator === "flux" ? 32 : generator == "zimage" ? 44 : 26
+    let messageTopTextSize = generator === "flux" ? 60 : generator == "zimage" ? 68 : 54
+    let messageBottomTextSize = generator === "flux" ? 32 : generator == "zimage" ? 40 : 26
     let memeTextSize = generator === "flux" ? 60 : generator == "zimage" ? 72 : 54
     
     try {
